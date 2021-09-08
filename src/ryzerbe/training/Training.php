@@ -2,6 +2,9 @@
 
 namespace ryzerbe\training;
 
+use BauboLP\Cloud\CloudBridge;
+use BauboLP\Cloud\Packets\MatchPacket;
+use jojoe77777\FormAPI\SimpleForm;
 use ryzerbe\training\entity\NPCEntity;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Skin;
@@ -17,6 +20,7 @@ use ReflectionException;
 use ryzerbe\training\item\TrainingItemManager;
 use ryzerbe\training\util\SkinUtils;
 use function is_dir;
+use function json_encode;
 use function scandir;
 use function str_replace;
 use function uniqid;
@@ -57,7 +61,21 @@ class Training extends PluginBase {
         $npcEntity = new NPCEntity(new Location(5.5, 115, -5.5, 0, 0, $level), $skin);
         $npcEntity->updateTitle(TextFormat::GOLD.TextFormat::BOLD."MLG-Training", TextFormat::WHITE."Clutches and more");
         $closure = function(Player $player, NPCEntity $entity): void{
+            $form = new SimpleForm(function(Player $player, $data): void{
+                if($data === null) return;
 
+                if($data === "soon") return;
+
+                $pk = new MatchPacket();
+                $pk->addData("group", "Training");
+                $pk->addData("minigame", $data);
+                $pk->addData("players", json_encode([$player->getName()]));
+                CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+            });
+
+            $form->addButton(TextFormat::GOLD."Clutches\n".TextFormat::DARK_GRAY."(".TextFormat::GREEN."Click to create session".TextFormat::DARK_GRAY.")", -1, "", "Clutches");
+            $form->addButton(TextFormat::GOLD."Random MLG\n".TextFormat::DARK_GRAY."(".TextFormat::RED."SOON".TextFormat::DARK_GRAY.")", -1, "", "soon");
+            $form->sendToPlayer($player);
         };
         $npcEntity->setInteractClosure($closure);
         $npcEntity->setAttackClosure($closure);
