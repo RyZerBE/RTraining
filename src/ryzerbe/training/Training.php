@@ -73,6 +73,7 @@ class Training extends PluginBase {
                 CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
             });
 
+            $form->setTitle(TextFormat::GOLD."MLG-Training");
             $form->addButton(TextFormat::GOLD."Clutches\n".TextFormat::DARK_GRAY."(".TextFormat::GREEN."Click to create session".TextFormat::DARK_GRAY.")", -1, "", "Clutches");
             $form->addButton(TextFormat::GOLD."Random MLG\n".TextFormat::DARK_GRAY."(".TextFormat::RED."SOON".TextFormat::DARK_GRAY.")", -1, "", "soon");
             $form->sendToPlayer($player);
@@ -85,7 +86,19 @@ class Training extends PluginBase {
         $npcEntity = new NPCEntity(new Location(-0.5, 115, -5.5, 0, 0, $level), $skin);
         $npcEntity->updateTitle(TextFormat::GRAY.TextFormat::BOLD."AimTrainer", TextFormat::WHITE."Practice your aim");
         $closure = function(Player $player, NPCEntity $entity): void{
+            $form = new SimpleForm(function(Player $player, $data): void{
+                if($data === null) return;
+                if($data === "soon") return;
 
+                $pk = new MatchPacket();
+                $pk->addData("group", "Training");
+                $pk->addData("minigame", $data);
+                $pk->addData("players", json_encode([$player->getName()]));
+                CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+            });
+            $form->setTitle(TextFormat::DARK_GRAY."Aim-Trainer");
+            $form->addButton(TextFormat::GRAY.TextFormat::BOLD."Aim Trainer\n".TextFormat::RESET.TextFormat::DARK_GRAY."(".TextFormat::GREEN."Click to create session".TextFormat::DARK_GRAY.")", -1, "", "Aim Trainer");
+            $form->sendToPlayer($player);
         };
         $npcEntity->setInteractClosure($closure);
         $npcEntity->setAttackClosure($closure);
