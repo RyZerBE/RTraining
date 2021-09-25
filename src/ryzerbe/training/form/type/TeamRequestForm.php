@@ -15,7 +15,7 @@ class TeamRequestForm extends Form {
      * @param Player $player
      * @param array $extraData
      */
-    public static function open(Player $player, array $extraData = []){
+    public static function open(Player $player, array $extraData = []): void{
         $willInvite = $extraData["playerName"];
         $form = new SimpleForm(function(Player $player, $data) use ($willInvite): void{
             if($data === null) return;

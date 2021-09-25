@@ -2,6 +2,8 @@
 
 namespace ryzerbe\training\player;
 
+use BauboLP\Cloud\CloudBridge;
+use BauboLP\Cloud\Packets\MatchPacket;
 use baubolp\core\provider\AsyncExecutor;
 use baubolp\core\provider\LanguageProvider;
 use mysqli;
@@ -9,11 +11,14 @@ use pocketmine\Player;
 use pocketmine\Server;
 use ryzerbe\training\challenge\Challenge;
 use ryzerbe\training\challenge\ChallengeManager;
+use ryzerbe\training\form\type\SelectGameForm;
 use ryzerbe\training\player\setting\PlayerSettings;
 use ryzerbe\training\team\Team;
 use ryzerbe\training\team\TeamManager;
 use ryzerbe\training\Training;
 use function count;
+use function implode;
+use function json_encode;
 use function time;
 
 class TrainingPlayer {
@@ -121,7 +126,7 @@ class TrainingPlayer {
         }
 
         if($manager->hasChallenged($this->getPlayer(), $challenger->getPlayer())){
-            $challenge = $manager->getChallenges()[$challenger->getPlayer()->getName()]??null;
+            $challenge = $manager->getChallenges()[$challenger->getPlayer()->getName()][$this->getPlayer()->getName()] ?? null;
             if($this->getTeam() !== null) {
                 if($challenger->getTeam() === null) {
                     $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-request-invalid",  $challenger->getPlayer()->getName()));
@@ -135,9 +140,8 @@ class TrainingPlayer {
             }
             $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-challenge-accept", $challenger->getPlayer()->getName(), ["#player" => $this->getPlayer()->getName()]));
             $this->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-challenge-accepted", $challenger->getPlayer()->getName(), ["#player" => $challenger->getPlayer()->getName()]));
-            $manager->removeChallenge($this->getPlayer()->getName(), $challenger->getPlayer()->getName());
-            $manager->removeChallenge($challenger->getPlayer()->getName(), $this->getPlayer()->getName());
 
+            SelectGameForm::open($this->getPlayer(), ["opponent" => $challenger->getPlayer()->getName(), "challenge" => $challenge]);
             return;
         }
 

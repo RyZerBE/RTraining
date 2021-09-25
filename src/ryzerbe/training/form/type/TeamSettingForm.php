@@ -15,7 +15,7 @@ class TeamSettingForm extends Form {
      * @param Player $player
      * @param array $extraData
      */
-    public static function open(Player $player, array $extraData = []){
+    public static function open(Player $player, array $extraData = []): void{
         $trainingPlayer = TrainingPlayerManager::getPlayer($player);
         if($trainingPlayer === null) return;
         $form = new SimpleForm(function(Player $player, $data) use ($trainingPlayer): void{
