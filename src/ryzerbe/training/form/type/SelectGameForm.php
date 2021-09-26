@@ -51,6 +51,7 @@ class SelectGameForm extends Form {
             $pk = new MatchPacket();
             $pk->addData("group", "Training");
             $pk->addData("minigame", $data);
+            $pk->addData("kitName", $trainingPlayer->getKit()->getName());
             if($challenge->getTeam() === null && $trainingPlayer->getTeam() === null) {
                 $pk->addData("players", json_encode([$opponentPlayer->getPlayer()->getName(), $player->getName()]));
                 $pk->addData("teams", json_encode([

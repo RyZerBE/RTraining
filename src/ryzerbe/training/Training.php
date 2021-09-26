@@ -108,11 +108,12 @@ class Training extends PluginBase {
                                             case "Select":
                                                 AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($kitName, $playerName): void{
                                                     $mysqli->query("UPDATE `kitpvp_kits_player` SET kit_name='$kitName' WHERE playername='$playerName'");
-                                                }, function(Server $server, $result) use ($playerName): void{
-                                                    $player = $server->getPlayerExact($playerName);
-                                                    if($player === null) return;
+                                                }, function(Server $server, $result) use ($playerName, $kit): void{
+                                                    $trainingPlayer = TrainingPlayerManager::getPlayer($playerName);
+                                                    if($trainingPlayer === null) return;
 
-                                                    $player->playSound("random.levelup", 5.0, 1.0, [$player]);
+                                                    $trainingPlayer->setKit($kit);
+                                                    $trainingPlayer->getPlayer()->playSound("random.levelup", 5.0, 1.0, [$trainingPlayer->getPlayer()]);
                                                 });
                                                 break;
                                             case "Sort":

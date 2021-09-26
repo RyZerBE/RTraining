@@ -12,6 +12,8 @@ use pocketmine\Server;
 use ryzerbe\training\challenge\Challenge;
 use ryzerbe\training\challenge\ChallengeManager;
 use ryzerbe\training\form\type\SelectGameForm;
+use ryzerbe\training\kit\Kit;
+use ryzerbe\training\kit\KitManager;
 use ryzerbe\training\player\setting\PlayerSettings;
 use ryzerbe\training\team\Team;
 use ryzerbe\training\team\TeamManager;
@@ -31,6 +33,8 @@ class TrainingPlayer {
 
     /** @var string|null  */
     private ?string $teamId = null;
+    /** @var Kit  */
+    private Kit $kit;
 
     /** @var PlayerSettings  */
     private PlayerSettings $playerSettings;
@@ -41,6 +45,7 @@ class TrainingPlayer {
     public function __construct(Player $player){
         $this->player = $player;
         $this->playerSettings = new PlayerSettings($player);
+        $this->kit = KitManager::getInstance()->getKitByName("Starter");
         $this->load();
     }
 
@@ -57,11 +62,24 @@ class TrainingPlayer {
             }else $mysqli->query("INSERT INTO `settings`(`playername`, `team_request`, `challenge_request`) VALUES ('$playerName', true, true)");
 
 
+            $res = $mysqli->query("SELECT * FROM `kitpvp_kits_player` WHERE playername='$playerName'");
+            if($res->num_rows <= 0) {
+                $mysqli->query("INSERT INTO `kitpvp_kits_player`(`playername`, `kit_name`) VALUES ('$playerName', 'Starter')");
+                $loadedData["kitName"] = "Starter";
+            }else {
+                $kitName = $res->fetch_assoc()["kit_name"];
+                $loadedData["kitName"] = $kitName;
+            }
+
             return $loadedData;
         }, function(Server $server, array $loadedData) use ($playerName): void{
             $trainingPlayer = TrainingPlayerManager::getPlayer($playerName);
             if($trainingPlayer === null) return;
 
+            $kit = KitManager::getInstance()->getKitByName($loadedData["kitName"] ?? "Starter");
+            if($kit === null) $kit = KitManager::getInstance()->getKitByName("Starter");
+
+            $trainingPlayer->setKit($kit);
             $trainingPlayer->getPlayerSettings()->setChallengeRequests($loadedData["challenge_request"] ?? true);
             $trainingPlayer->getPlayerSettings()->setTeamRequests($loadedData["team_request"] ?? true);
         });
@@ -184,5 +202,19 @@ class TrainingPlayer {
      */
     public function getPlayerSettings(): PlayerSettings{
         return $this->playerSettings;
+    }
+
+    /**
+     * @return Kit
+     */
+    public function getKit(): Kit{
+        return $this->kit;
+    }
+
+    /**
+     * @param Kit $kit
+     */
+    public function setKit(Kit $kit): void{
+        $this->kit = $kit;
     }
 }
