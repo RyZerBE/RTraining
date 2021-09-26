@@ -2,6 +2,8 @@
 
 namespace ryzerbe\training\player\setting;
 
+use baubolp\core\provider\AsyncExecutor;
+use mysqli;
 use pocketmine\Player;
 
 class PlayerSettings {
@@ -53,5 +55,14 @@ class PlayerSettings {
      */
     public function allowTeamRequests(): bool{
         return $this->teamRequests;
+    }
+
+    public function saveToDatabase(): void{
+        $playerName = $this->getPlayer()->getName();
+        $challenge = $this->allowChallengeRequests();
+        $team = $this->allowTeamRequests();
+        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($team, $challenge, $playerName): void{
+            $mysqli->query("UPDATE `settings` SET team_request='$team',challenge_request='$challenge' WHERE playername='$playerName'");
+        });
     }
 }

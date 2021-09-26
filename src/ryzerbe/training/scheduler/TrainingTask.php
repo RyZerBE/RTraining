@@ -25,7 +25,7 @@ class TrainingTask extends Task {
                 $trainingPlayer->removeTeamRequest($requester);
             }
 
-            if($trainingPlayer->getPlayer()->getY() < 70)
+            if($trainingPlayer->getPlayer()->getY() < 80)
                 $trainingPlayer->getPlayer()->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn()->add(0, 1));
         }
     }

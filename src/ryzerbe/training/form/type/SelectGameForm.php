@@ -52,6 +52,7 @@ class SelectGameForm extends Form {
             $pk->addData("group", "Training");
             $pk->addData("minigame", $data);
             if($challenge->getTeam() === null && $trainingPlayer->getTeam() === null) {
+                $pk->addData("players", json_encode([$opponentPlayer->getPlayer()->getName(), $player->getName()]));
                 $pk->addData("teams", json_encode([
                     "team_1" => [
                         "players" => [$opponentPlayer->getPlayer()->getName()],
@@ -63,6 +64,11 @@ class SelectGameForm extends Form {
                     ]
                 ]));
             }else if($challenge->getTeam() !== null && $trainingPlayer->getTeam() !== null) {
+                $playerNames = [];
+                $playerNames[] = $trainingPlayer->getTeam()->getPlayers(true);
+                $playerNames[] = $challenge->getTeam()->getPlayers(true);
+
+                $pk->addData("players", json_encode($playerNames));
                 $pk->addData("teams", json_encode([
                     "team_1" => [
                         "players" => $challenge->getTeam()->getPlayers(true),

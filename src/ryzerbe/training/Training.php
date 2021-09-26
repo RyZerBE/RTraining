@@ -4,7 +4,11 @@ namespace ryzerbe\training;
 
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\MatchPacket;
+use baubolp\core\provider\AsyncExecutor;
+use baubolp\core\provider\LanguageProvider;
+use jojoe77777\FormAPI\CustomForm;
 use jojoe77777\FormAPI\SimpleForm;
+use mysqli;
 use ryzerbe\training\entity\NPCEntity;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Skin;
@@ -18,6 +22,9 @@ use pocketmine\utils\TextFormat;
 use ReflectionClass;
 use ReflectionException;
 use ryzerbe\training\item\TrainingItemManager;
+use ryzerbe\training\kit\KitCommand;
+use ryzerbe\training\kit\KitManager;
+use ryzerbe\training\player\TrainingPlayerManager;
 use ryzerbe\training\util\SkinUtils;
 use function is_dir;
 use function json_encode;
@@ -37,6 +44,11 @@ class Training extends PluginBase {
         $this->initListener(__DIR__."/listener/");
         $this->spawnEntities();
         Entity::registerEntity(NPCEntity::class, true);
+        KitManager::getInstance();
+        KitManager::getInstance()->loadKits();
+        $this->getServer()->getCommandMap()->registerAll("training", [
+            new KitCommand()
+        ]);
     }
 
     public function spawnEntities(): void{
@@ -52,7 +64,81 @@ class Training extends PluginBase {
         $npcEntity = new NPCEntity(new Location(2.5, 114, -5.5, 0, 0, $level), $skin);
         $npcEntity->updateTitle(TextFormat::AQUA."Configurations", TextFormat::WHITE."Click to configure");
         $closure = function(Player $player, NPCEntity $entity): void{
+            $form = new SimpleForm(function(Player $player, $data): void{
+                if($data === null) return;
 
+                $trainingPlayer = TrainingPlayerManager::getPlayer($player);
+                if($trainingPlayer === null) return;
+
+                switch($data) {
+                    case "Lobby":
+                        $form = new CustomForm(function(Player $player, $data) use ($trainingPlayer): void{
+                            if($data === null) return;
+
+                            $trainingPlayer->getPlayerSettings()->setTeamRequests($data["team_requests"]);
+                            $trainingPlayer->getPlayerSettings()->setChallengeRequests($data["match_requests"]);
+                        });
+
+                        $form->addToggle(LanguageProvider::getMessageContainer("training-team-request-setting", $player->getName()), $trainingPlayer->getPlayerSettings()->allowTeamRequests(), "team_requests");
+                        $form->addToggle(LanguageProvider::getMessageContainer("training-match-request-setting", $player->getName()), $trainingPlayer->getPlayerSettings()->allowTeamRequests(), "match_requests");
+                        $form->sendToPlayer($player);
+                        break;
+                    case "KitPvP":
+                        $form = new SimpleForm(function(Player $player, $data) use ($trainingPlayer): void{
+                            if($data === null) return;
+
+                            switch($data){
+                                case "kits":
+                                    $kits = [];
+                                    $actions = ["Select", "Sort"];
+                                    foreach(KitManager::getInstance()->getKits() as $kit) {
+                                        $kits[] = $kit->getName();
+                                    }
+                                    $form = new CustomForm(function(Player $player, $data) use ($trainingPlayer, $actions, $kits): void{
+                                        if($data === null) return;
+
+                                        $action = $actions[$data["action"]];
+                                        $kitName = $kits[$data["kits"]];
+
+                                        $kit = KitManager::getInstance()->getKitByName($kitName);
+                                        if($kit === null) return;
+
+                                        $playerName = $player->getName();
+                                        switch($action) {
+                                            case "Select":
+                                                AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($kitName, $playerName): void{
+                                                    $mysqli->query("UPDATE `kitpvp_kits_player` SET kit_name='$kitName' WHERE playername='$playerName'");
+                                                }, function(Server $server, $result) use ($playerName): void{
+                                                    $player = $server->getPlayerExact($playerName);
+                                                    if($player === null) return;
+
+                                                    $player->playSound("random.levelup", 5.0, 1.0, [$player]);
+                                                });
+                                                break;
+                                            case "Sort":
+                                                KitManager::getInstance()->loadPlayerKitToSort($player, $kitName);
+                                                break;
+                                        }
+                                    });
+
+                                    $form->addDropdown("Kits", $kits, null, "kits");
+                                    $form->addDropdown("Action", $actions, null, "action");
+                                    $form->sendToPlayer($player);
+                                    break;
+                            }
+                        });
+
+                        $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::GREEN." Kits", -1, "", "kits");
+                        $form->sendToPlayer($player);
+                        break;
+                }
+            });
+
+            $form->setContent(LanguageProvider::getMessageContainer("training-configuration-select-game", $player->getName()));
+            $form->setTitle(TextFormat::AQUA.TextFormat::BOLD."Settings");
+            $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::YELLOW.TextFormat::BOLD." Lobby", -1, "", "Lobby");
+            $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::BLUE.TextFormat::BOLD." KitPvP", -1, "", "KitPvP");
+            $form->sendToPlayer($player);
         };
         $npcEntity->setInteractClosure($closure);
         $npcEntity->setAttackClosure($closure);
