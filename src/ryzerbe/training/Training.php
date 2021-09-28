@@ -22,6 +22,7 @@ use pocketmine\utils\TextFormat;
 use ReflectionClass;
 use ReflectionException;
 use ryzerbe\training\item\TrainingItemManager;
+use ryzerbe\training\kit\EnchantCommand;
 use ryzerbe\training\kit\KitCommand;
 use ryzerbe\training\kit\KitManager;
 use ryzerbe\training\player\TrainingPlayerManager;
@@ -47,7 +48,8 @@ class Training extends PluginBase {
         KitManager::getInstance();
         KitManager::getInstance()->loadKits();
         $this->getServer()->getCommandMap()->registerAll("training", [
-            new KitCommand()
+            new KitCommand(),
+            new EnchantCommand()
         ]);
     }
 

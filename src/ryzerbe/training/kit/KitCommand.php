@@ -46,6 +46,7 @@ class KitCommand extends Command {
                     $aInv = $sender->getArmorInventory();
                     $inv->clearAll();
                     $aInv->clearAll();
+                    $sender->setGamemode(0);
                     break;
             }
             return;
@@ -64,6 +65,7 @@ class KitCommand extends Command {
                 $sender->getArmorInventory()->clearAll();
                 $sender->sendMessage(Training::PREFIX.TextFormat::GRAY."Nutze /kit save, um das Kit zu speichern.");
                 KitManager::getInstance()->editKit[$sender->getName()] = $kitName;
+                $sender->setGamemode(1);
                 break;
             case "edit":
                 $kit = KitManager::getInstance()->getKitByName($kitName);
@@ -80,6 +82,7 @@ class KitCommand extends Command {
                 $aInv->setContents($kit->getArmor());
                 $sender->sendMessage(Training::PREFIX.TextFormat::GRAY."Nutze /kit save, um das Kit zu speichern.");
                 KitManager::getInstance()->editKit[$sender->getName()] = $kitName;
+                $sender->setGamemode(1);
                 break;
             case "delete":
             case "del":

@@ -25,6 +25,7 @@ class RyZerPlayerAuthListener implements Listener {
         }
         $player->getInventory()->setHeldItemIndex(4);
         $player->setImmobile(false);
+        $player->setGamemode(0);
     }
 
     public function join(PlayerJoinEvent $event){
