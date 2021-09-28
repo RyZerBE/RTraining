@@ -23,13 +23,13 @@ class ChallengeManager {
     /**
      * @param Player|string $challenger
      * @param Player|string $enemy
-     * @return bool
+     * @return Challenge|null
      */
-    public function hasChallenged(Player|string $challenger, Player|string $enemy){
+    public function hasChallenged(Player|string $challenger, Player|string $enemy): ?Challenge{
         if($challenger instanceof Player) $challenger = $challenger->getName();
         if($enemy instanceof Player) $enemy = $enemy->getName();
 
-        return isset($this->challenges[$enemy][$challenger]);
+        return $this->challenges[$enemy][$challenger] ?? null;
     }
 
     /**

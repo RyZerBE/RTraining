@@ -135,16 +135,18 @@ class TrainingPlayer {
 
     /**
      * @param TrainingPlayer $challenger
+     * @param string $miniGameName
      */
-    public function challenge(TrainingPlayer $challenger){
+    public function challenge(TrainingPlayer $challenger, string $miniGameName){
         $manager = ChallengeManager::getInstance();
-        if($manager->hasChallenged($challenger->getPlayer(), $this->getPlayer())){
+
+        if($manager->hasChallenged($challenger->getPlayer(), $this->getPlayer()) !== null){
             $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-already-challenged", $challenger->getPlayer()->getName(), ["#player" => $this->getPlayer()->getName()]));
             return;
         }
 
-        if($manager->hasChallenged($this->getPlayer(), $challenger->getPlayer())){
-            $challenge = $manager->getChallenges()[$challenger->getPlayer()->getName()][$this->getPlayer()->getName()] ?? null;
+        $challenge = $manager->hasChallenged($this->getPlayer(), $challenger->getPlayer());
+        if($challenge !== null && $challenge->getMiniGameName() === $miniGameName){
             if($this->getTeam() !== null) {
                 if($challenger->getTeam() === null) {
                     $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-request-invalid",  $challenger->getPlayer()->getName()));
@@ -159,13 +161,13 @@ class TrainingPlayer {
             $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-challenge-accept", $challenger->getPlayer()->getName(), ["#player" => $this->getPlayer()->getName()]));
             $this->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-challenge-accepted", $challenger->getPlayer()->getName(), ["#player" => $challenger->getPlayer()->getName()]));
 
-            SelectGameForm::open($this->getPlayer(), ["opponent" => $challenger->getPlayer()->getName(), "challenge" => $challenge]);
+            $challenge->accept($this, $challenger);
             return;
         }
 
-        $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-challenged-player", $challenger->getPlayer()->getName(), ["#player" => $this->getPlayer()->getName()]));
-        $this->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-got-challenge", $challenger->getPlayer()->getName(), ["#player" => $challenger->getPlayer()->getName()]));
-        $manager->addChallenge($this, new Challenge($challenger, $this->getPlayer()->getName(), TeamManager::getTeam($challenger->getTeamId() ?? "hurensohn")));
+        $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-challenged-player", $challenger->getPlayer()->getName(), ["#player" => $this->getPlayer()->getName(), "#minigame" => $miniGameName]));
+        $this->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-got-challenge", $challenger->getPlayer()->getName(), ["#player" => $challenger->getPlayer()->getName(), "#minigame" => $miniGameName]));
+        $manager->addChallenge($this, new Challenge($challenger, $this->getPlayer()->getName(), $miniGameName, TeamManager::getTeam($challenger->getTeamId() ?? "hurensohn")));
     }
 
     /**

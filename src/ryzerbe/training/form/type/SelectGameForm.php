@@ -7,6 +7,7 @@ use BauboLP\Cloud\Packets\MatchPacket;
 use baubolp\core\provider\LanguageProvider;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\training\challenge\Challenge;
 use ryzerbe\training\challenge\ChallengeManager;
@@ -29,66 +30,38 @@ class SelectGameForm extends Form {
 
         $form = new SimpleForm(function(Player $player, $data) use ($trainingPlayer, $extraData): void{
             if($data === null) return;
-            $manager = ChallengeManager::getInstance();
 
-            $opponentPlayer = TrainingPlayerManager::getPlayer($extraData["opponent"]);
-            if($opponentPlayer === null) return;
+            $entityName = $extraData["opponent"];
+            $entity = Server::getInstance()->getPlayerExact($entityName);
+            if($entity === null) return;
 
-            /** @var Challenge $challenge */
-            $challenge = $extraData["challenge"];
-            if($trainingPlayer->getTeam() !== null) {
-                if($opponentPlayer->getTeam() === null) {
-                    $opponentPlayer->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-request-invalid",  $opponentPlayer->getPlayer()->getName()));
-                    return;
-                }
-                if(count($challenge->getTeam()->getPlayers()) != count($trainingPlayer->getTeam()->getPlayers())) {
-                    $challenge->remove();
-                    $opponentPlayer->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-request-invalid",  $opponentPlayer->getPlayer()->getName()));
-                    return;
-                }
-            }
+            $willChallenge = TrainingPlayerManager::getPlayer($entity);
+            $challenger = TrainingPlayerManager::getPlayer($player);
+            if($willChallenge === null || $challenger === null) return;
 
-            $pk = new MatchPacket();
-            $pk->addData("group", "Training");
-            $pk->addData("minigame", $data);
-            $pk->addData("kitName", $trainingPlayer->getKit()->getName());
-            if($challenge->getTeam() === null && $trainingPlayer->getTeam() === null) {
-                $pk->addData("players", json_encode([$opponentPlayer->getPlayer()->getName(), $player->getName()]));
-                $pk->addData("teams", json_encode([
-                    "team_1" => [
-                        "players" => [$opponentPlayer->getPlayer()->getName()],
-                        "data" => ["name" => "Team 1", "color" => "§b"]
-                    ],
-                    "team_2" => [
-                        "players" => [$player->getName()],
-                        "data" => ["name" => "Team 2", "color" => "§c"]
-                    ]
-                ]));
-            }else if($challenge->getTeam() !== null && $trainingPlayer->getTeam() !== null) {
-                $playerNames = [];
-                $playerNames[] = $trainingPlayer->getTeam()->getPlayers(true);
-                $playerNames[] = $challenge->getTeam()->getPlayers(true);
-
-                $pk->addData("players", json_encode($playerNames));
-                $pk->addData("teams", json_encode([
-                    "team_1" => [
-                        "players" => $challenge->getTeam()->getPlayers(true),
-                        "data" => ["name" => "Team 1", "color" => "§b"]
-                    ],
-                    "team_2" => [
-                        "players" => $trainingPlayer->getTeam()->getPlayers(true),
-                        "data" => ["name" => "Team 2", "color" => "§c"]
-                    ]
-                ])); //todo: team name configurable
-            }else {
-                $opponentPlayer->getPlayer()->sendMessage("ERROR WITH TEAM SHIT");
-                $player->getPlayer()->sendMessage("ERROR WITH TEAM SHIT");
+            if($willChallenge->getTeam() === null && $challenger->getTeam() !== null){
+                $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-teams-only-challenge-teams", $player->getName()));
                 return;
             }
 
-            CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
-            $manager->removeChallenge($player->getName(), $opponentPlayer->getPlayer()->getName());
-            $manager->removeChallenge($opponentPlayer->getPlayer()->getName(), $player->getName());
+            if($willChallenge->getTeam() !== null && $challenger->getTeam() === null){
+                $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-already-in-team", $player->getName()));
+                return;
+            }
+
+            if($willChallenge->getTeam() !== null && $challenger->getTeam() !== null){
+                $creatorName = $willChallenge->getTeam()->getCreator()->getPlayer()->getName();
+                if($creatorName != $entity->getName()){
+                    $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-isnt-team-creator", $player->getName(), ["#creator" => $creatorName]));
+                    return;
+                }
+            }
+
+            if(!$willChallenge->getPlayerSettings()->allowChallengeRequests()){
+                $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-challenge-request-disabled", $player->getName()));
+                return;
+            }
+            $willChallenge->challenge($challenger, $data);
         });
 
         $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Select Game");

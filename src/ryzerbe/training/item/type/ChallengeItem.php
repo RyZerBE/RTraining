@@ -6,6 +6,7 @@ use baubolp\core\provider\LanguageProvider;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\player\PlayerInteractEntityEvent;
 use pocketmine\Player;
+use ryzerbe\training\form\type\SelectGameForm;
 use ryzerbe\training\form\type\TeamRequestForm;
 use ryzerbe\training\item\TrainingItem;
 use ryzerbe\training\player\TrainingPlayerManager;
@@ -26,33 +27,7 @@ class ChallengeItem extends TrainingItem {
             if($hitter->hasItemCooldown($item)) return;
             $hitter->resetItemCooldown($item, 20);
 
-            $willChallenge = TrainingPlayerManager::getPlayer($entity);
-            $challenger = TrainingPlayerManager::getPlayer($hitter);
-            if($willChallenge === null || $challenger === null) return;
-
-            if($willChallenge->getTeam() === null && $challenger->getTeam() !== null) {
-                $hitter->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-teams-only-challenge-teams", $hitter->getName()));
-                return;
-            }
-
-            if($willChallenge->getTeam() !== null && $challenger->getTeam() === null){
-                $hitter->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-already-in-team", $hitter->getName()));
-                return;
-            }
-
-            if($willChallenge->getTeam() !== null && $challenger->getTeam() !== null) {
-                $creatorName = $willChallenge->getTeam()->getCreator()->getPlayer()->getName();
-                if($creatorName != $entity->getName()) {
-                    $hitter->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-isnt-team-creator", $hitter->getName(), ["#creator" => $creatorName]));
-                    return;
-                }
-            }
-
-            if(!$willChallenge->getPlayerSettings()->allowChallengeRequests()) {
-                $hitter->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-challenge-request-disabled", $hitter->getName()));
-                return;
-            }
-            $willChallenge->challenge($challenger);
+            SelectGameForm::open($hitter, ["opponent" => $entity->getName()]);
         }
     }
 

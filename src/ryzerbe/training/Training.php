@@ -77,6 +77,7 @@ class Training extends PluginBase {
 
                             $trainingPlayer->getPlayerSettings()->setTeamRequests($data["team_requests"]);
                             $trainingPlayer->getPlayerSettings()->setChallengeRequests($data["match_requests"]);
+                            $player->playSound("random.levelup", 5.0, 1.0, [$player]);
                         });
 
                         $form->addToggle(LanguageProvider::getMessageContainer("training-team-request-setting", $player->getName()), $trainingPlayer->getPlayerSettings()->allowTeamRequests(), "team_requests");
