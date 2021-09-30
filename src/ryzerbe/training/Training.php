@@ -198,7 +198,19 @@ class Training extends PluginBase {
         $npcEntity = new NPCEntity(new Location(8.5, 115, -4.5, 0, 0, $level), $skin);
         $npcEntity->updateTitle(TextFormat::YELLOW.TextFormat::BOLD."Bridger", TextFormat::WHITE."Practice your building skills");
         $closure = function(Player $player, NPCEntity $entity): void{
+            $form = new SimpleForm(function(Player $player, $data): void{
+                if($data === null) return;
+                if($data === "soon") return;
 
+                $pk = new MatchPacket();
+                $pk->addData("group", "Training");
+                $pk->addData("minigame", $data);
+                $pk->addData("players", json_encode([$player->getName()]));
+                CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+            });
+            $form->setTitle(TextFormat::DARK_GRAY."Bridger");
+            $form->addButton(TextFormat::GRAY.TextFormat::BOLD."Bridger\n".TextFormat::RESET.TextFormat::DARK_GRAY."(".TextFormat::GREEN."Click to create session".TextFormat::DARK_GRAY.")", -1, "", "Bridger");
+            $form->sendToPlayer($player);
         };
         $npcEntity->setInteractClosure($closure);
         $npcEntity->setAttackClosure($closure);
