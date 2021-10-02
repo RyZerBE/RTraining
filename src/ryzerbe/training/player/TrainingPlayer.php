@@ -45,7 +45,7 @@ class TrainingPlayer {
     public function __construct(Player $player){
         $this->player = $player;
         $this->playerSettings = new PlayerSettings($player);
-        $this->kit = KitManager::getInstance()->getKitByName("Starter");
+        $this->kit = KitManager::getInstance()->getKitByName("OnlySword");
         $this->load();
     }
 
@@ -64,8 +64,8 @@ class TrainingPlayer {
 
             $res = $mysqli->query("SELECT * FROM `kitpvp_kits_player` WHERE playername='$playerName'");
             if($res->num_rows <= 0) {
-                $mysqli->query("INSERT INTO `kitpvp_kits_player`(`playername`, `kit_name`) VALUES ('$playerName', 'Starter')");
-                $loadedData["kitName"] = "Starter";
+                $mysqli->query("INSERT INTO `kitpvp_kits_player`(`playername`, `kit_name`) VALUES ('$playerName', 'OnlySword')");
+                $loadedData["kitName"] = "OnlySword";
             }else {
                 $kitName = $res->fetch_assoc()["kit_name"];
                 $loadedData["kitName"] = $kitName;
@@ -76,8 +76,8 @@ class TrainingPlayer {
             $trainingPlayer = TrainingPlayerManager::getPlayer($playerName);
             if($trainingPlayer === null) return;
 
-            $kit = KitManager::getInstance()->getKitByName($loadedData["kitName"] ?? "Starter");
-            if($kit === null) $kit = KitManager::getInstance()->getKitByName("Starter");
+            $kit = KitManager::getInstance()->getKitByName($loadedData["kitName"] ?? "OnlySword");
+            if($kit === null) $kit = KitManager::getInstance()->getKitByName("OnlySword");
 
             $trainingPlayer->setKit($kit);
             $trainingPlayer->getPlayerSettings()->setChallengeRequests($loadedData["challenge_request"] ?? true);

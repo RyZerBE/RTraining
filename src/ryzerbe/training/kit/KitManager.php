@@ -135,7 +135,7 @@ class KitManager {
             }else {
                 $kit = KitManager::getInstance()->getKitByName($result);
                 if($kit === null) {
-                    $kit = KitManager::getInstance()->getKitByName("Starter");
+                    $kit = KitManager::getInstance()->getKitByName("OnlySword");
                 }
 
                 $player->getInventory()->setContents($kit->getItems());
