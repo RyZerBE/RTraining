@@ -116,9 +116,13 @@ class Challenge {
             ]));
         }else if($this->getTeam() !== null && $trainingPlayer->getTeam() !== null) {
             $playerNames = [];
-            $playerNames[] = $trainingPlayer->getTeam()->getPlayers(true);
-            $playerNames[] = $this->getTeam()->getPlayers(true);
 
+            foreach($opponentPlayer->getTeam()->getPlayers(true) as $playerNameee) {
+                $playerNames[] = $playerNameee;
+            }
+            foreach($this->getTeam()->getPlayers(true) as $playerNameee) {
+                $playerNames[] = $playerNameee;
+            }
             $pk->addData("players", json_encode($playerNames));
             $pk->addData("teams", json_encode([
                 "team_1" => [
