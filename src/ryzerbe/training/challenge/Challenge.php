@@ -130,7 +130,7 @@ class Challenge {
                     "data" => ["name" => "Team 1", "color" => "§b"]
                 ],
                 "team_2" => [
-                    "players" => $trainingPlayer->getTeam()->getPlayers(true),
+                    "players" => $opponentPlayer->getTeam()->getPlayers(true),
                     "data" => ["name" => "Team 2", "color" => "§c"]
                 ]
             ])); //todo: team name configurable
