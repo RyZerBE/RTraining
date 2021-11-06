@@ -1,0 +1,9 @@
+name: Training
+version: 1.0
+api: 3.0.0
+main: ryzerbe\training\Training
+load: POSTWORLD
+
+permissions:
+  training.admin:
+    default: op
