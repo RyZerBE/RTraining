@@ -1,7 +1,7 @@
-name: Training-GameServer
+name: Training-Lobby
 version: 1.0.0
 api: 3.0.0
-main: ryzerbe\training\gameserver\Training
+main: ryzerbe\training\lobby\Training
 load: POSTWORLD
 
 permissions:
