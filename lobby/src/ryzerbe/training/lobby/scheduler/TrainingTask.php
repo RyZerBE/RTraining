@@ -6,6 +6,7 @@ use pocketmine\scheduler\Task;
 use pocketmine\Server;
 use ryzerbe\training\lobby\challenge\ChallengeManager;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
+use ryzerbe\training\lobby\queue\QueueManager;
 use function time;
 
 class TrainingTask extends Task {
@@ -24,9 +25,10 @@ class TrainingTask extends Task {
                 if($time > time()) continue;
                 $trainingPlayer->removeTeamRequest($requester);
             }
+        }
 
-            if($trainingPlayer->getPlayer()->getY() < 80)
-                $trainingPlayer->getPlayer()->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn()->add(0, 1));
+        foreach(QueueManager::getInstance()->getQueues() as $queue) {
+            $queue->update();
         }
     }
 }

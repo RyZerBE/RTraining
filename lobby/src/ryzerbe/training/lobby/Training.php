@@ -26,6 +26,7 @@ use ryzerbe\training\lobby\kit\EnchantCommand;
 use ryzerbe\training\lobby\kit\KitCommand;
 use ryzerbe\training\lobby\kit\KitManager;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
+use ryzerbe\training\lobby\scheduler\TrainingTask;
 use ryzerbe\training\lobby\util\SkinUtils;
 use function is_dir;
 use function json_encode;
@@ -41,12 +42,18 @@ class Training extends PluginBase {
 
     public function onEnable(){
         self::$instance = $this;
+
         TrainingItemManager::getInstance();
+
         $this->initListener(__DIR__."/listener/");
         $this->spawnEntities();
+
+        $this->getScheduler()->scheduleRepeatingTask(new TrainingTask(), 1);
+
         Entity::registerEntity(NPCEntity::class, true);
-        KitManager::getInstance();
+
         KitManager::getInstance()->loadKits();
+
         $this->getServer()->getCommandMap()->registerAll("training", [
             new KitCommand(),
             new EnchantCommand()
@@ -148,6 +155,7 @@ class Training extends PluginBase {
         $npcEntity->setInteractClosure($closure);
         $npcEntity->setAttackClosure($closure);
         $npcEntity->spawnToAll();
+
         // MLG-Training \\
         $npcEntity = new NPCEntity(new Location(5.5, 115, -5.5, 0, 0, $level), $skin);
         $npcEntity->updateTitle(TextFormat::GOLD.TextFormat::BOLD."MLG-Training", TextFormat::WHITE."Clutches and more");
