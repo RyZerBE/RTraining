@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\training;
+namespace ryzerbe\training\lobby;
 
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\MatchPacket;
@@ -54,12 +54,13 @@ class Training extends PluginBase {
     }
 
     public function spawnEntities(): void{
+        $config = new Config("/root/RyzerCloud/data/NPC/default_geometry.json");
         $skin = new Skin(
             uniqid(),
             SkinUtils::readImage("/root/RyzerCloud/data/NPC/backup_skin.png"),
             "",
-            (new Config("/root/RyzerCloud/data/NPC/default_geometry.json"))->get("name"),
-            (new Config("/root/RyzerCloud/data/NPC/default_geometry.json"))->get("geo")
+            $config->get("name"),
+            $config->get("geo")
         );
         // CONFIGURATIONS \\
         $level = Server::getInstance()->getDefaultLevel();

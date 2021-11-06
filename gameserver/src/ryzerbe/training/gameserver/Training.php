@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\training;
+namespace ryzerbe\training\gameserver;
 
 use pocketmine\event\Listener;
 use pocketmine\item\Item;
@@ -13,7 +13,6 @@ use ReflectionException;
 use ryzerbe\training\gameserver\command\EnchantCommand;
 use ryzerbe\training\gameserver\command\KitCommand;
 use ryzerbe\training\gameserver\command\LeaveCommand;
-use ryzerbe\training\gameserver\game\map\GameMapManger;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\minigame\type\aimtrainer\AimTrainerMinigame;
