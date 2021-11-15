@@ -9,17 +9,16 @@ use jojoe77777\FormAPI\SimpleForm;
 use mysqli;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Skin;
-use pocketmine\event\Listener;
 use pocketmine\level\Location;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
-use ReflectionClass;
 use ReflectionException;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\core\util\loader\ListenerDirectoryLoader;
 use ryzerbe\training\lobby\entity\NPCEntity;
 use ryzerbe\training\lobby\item\TrainingItemManager;
 use ryzerbe\training\lobby\kit\EnchantCommand;
@@ -28,10 +27,7 @@ use ryzerbe\training\lobby\kit\KitManager;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\scheduler\TrainingTask;
 use ryzerbe\training\lobby\util\SkinUtils;
-use function is_dir;
 use function json_encode;
-use function scandir;
-use function str_replace;
 use function uniqid;
 
 class Training extends PluginBase {
@@ -48,7 +44,7 @@ class Training extends PluginBase {
 
         TrainingItemManager::getInstance();
 
-        $this->initListener(__DIR__."/listener/");
+        ListenerDirectoryLoader::load($this, $this->getFile(), __DIR__ . "/listener/");
         $this->spawnEntities();
 
         $this->getScheduler()->scheduleRepeatingTask(new TrainingTask(), 1);
@@ -237,27 +233,6 @@ class Training extends PluginBase {
         $npcEntity->setInteractClosure($closure);
         $npcEntity->setAttackClosure($closure);
         $npcEntity->spawnToAll();
-    }
-
-    /**
-     * @param string $directory
-     * @throws ReflectionException
-     */
-    private function initListener(string $directory): void{
-        foreach(scandir($directory) as $listener){
-            if($listener === "." || $listener === "..") continue;
-            if(is_dir($directory.$listener)){
-                $this->initListener($directory.$listener."/");
-                continue;
-            }
-            $dir = str_replace([$this->getFile()."src/", "/"], ["", "\\"], $directory);
-            $refClass = new ReflectionClass($dir.str_replace(".php", "", $listener));
-            $class = new ($refClass->getName());
-            if($class instanceof Listener){
-                Server::getInstance()->getPluginManager()->registerEvents($class, $this);
-                Server::getInstance()->getLogger()->debug("Registered ".$refClass->getShortName()." listener");
-            }
-        }
     }
 
     /**

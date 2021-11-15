@@ -2,14 +2,12 @@
 
 namespace ryzerbe\training\gameserver;
 
-use pocketmine\event\Listener;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
 use pocketmine\utils\TextFormat;
-use ReflectionClass;
 use ReflectionException;
+use ryzerbe\core\util\loader\ListenerDirectoryLoader;
 use ryzerbe\training\gameserver\command\EnchantCommand;
 use ryzerbe\training\gameserver\command\KitCommand;
 use ryzerbe\training\gameserver\command\LeaveCommand;
@@ -36,7 +34,7 @@ class Training extends PluginBase {
         CustomItemManager::getInstance();
         ModuleManager::getInstance();
 
-        $this->initListener(__DIR__."/listener/");
+        ListenerDirectoryLoader::load($this, $this->getFile(), __DIR__ . "/listener/");
         $this->initEntity();
         $this->initMinigames();
         $this->initCustomItems();
@@ -79,25 +77,5 @@ class Training extends PluginBase {
 
     private function initEntity(): void{
 
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    private function initListener(string $directory): void{
-        foreach(scandir($directory) as $listener){
-            if($listener === "." || $listener === "..") continue;
-            if(is_dir($directory.$listener)){
-                $this->initListener($directory.$listener."/");
-                continue;
-            }
-            $dir = str_replace([$this->getFile()."src/", "/"], ["", "\\"], $directory);
-            $refClass = new ReflectionClass($dir.str_replace(".php", "", $listener));
-            $class = new ($refClass->getName());
-            if($class instanceof Listener){
-                Server::getInstance()->getPluginManager()->registerEvents($class, $this);
-                Server::getInstance()->getLogger()->debug("Registered ".$refClass->getShortName()." listener");
-            }
-        }
     }
 }
