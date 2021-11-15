@@ -4,9 +4,9 @@ namespace ryzerbe\training\gameserver\game\match;
 
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
-use baubolp\core\player\RyzerPlayerProvider;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\training\gameserver\game\team\Team;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\session\Session;
@@ -65,7 +65,7 @@ class MatchRequest {
         }
 
         foreach($this->getPlayerNames() as $playerName){
-            $player = RyzerPlayerProvider::getRyzerPlayer($playerName);
+            $player = RyZerPlayerProvider::getRyzerPlayer($playerName);
             if($player === null || !$player->getPlayer()->spawned) return false;
         }
         return true;

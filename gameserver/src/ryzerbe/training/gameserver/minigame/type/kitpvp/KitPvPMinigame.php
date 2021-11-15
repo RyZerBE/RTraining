@@ -2,11 +2,11 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp;
 
-use baubolp\core\provider\AsyncExecutor;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\level\Location;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\map\GameMap;
 use ryzerbe\training\gameserver\game\map\Map;

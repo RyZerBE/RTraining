@@ -18,7 +18,7 @@ trait BlockStorageTrait {
     }
 
     public function resetBlocks(string $identifier = "default"): void {
-        foreach(($this->blocks[$identifier] ?? []) as $hash => $position) {
+        foreach(($this->blocks[$identifier] ?? []) as $position) {
             $position->getLevel()->setBlockIdAt($position->x, $position->y, $position->z, 0);
             $position->getLevel()->setBlockDataAt($position->x, $position->y, $position->z, 0);
         }

@@ -3,10 +3,10 @@
 namespace ryzerbe\training\gameserver\scheduler;
 
 use BauboLP\Cloud\CloudBridge;
-use baubolp\core\provider\LanguageProvider;
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\gameserver\game\match\MatchQueue;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\session\SessionManager;

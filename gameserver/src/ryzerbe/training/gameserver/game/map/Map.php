@@ -2,10 +2,10 @@
 
 namespace ryzerbe\training\gameserver\game\map;
 
-use baubolp\core\provider\AsyncExecutor;
 use Closure;
 use pocketmine\level\Level;
 use pocketmine\Server;
+use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\gameserver\session\Session;
 use function popen;
 use function uniqid;

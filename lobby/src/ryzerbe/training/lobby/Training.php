@@ -4,12 +4,9 @@ namespace ryzerbe\training\lobby;
 
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\MatchPacket;
-use baubolp\core\provider\AsyncExecutor;
-use baubolp\core\provider\LanguageProvider;
 use jojoe77777\FormAPI\CustomForm;
 use jojoe77777\FormAPI\SimpleForm;
 use mysqli;
-use ryzerbe\training\lobby\entity\NPCEntity;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Skin;
 use pocketmine\event\Listener;
@@ -21,6 +18,9 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use ReflectionClass;
 use ReflectionException;
+use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\training\lobby\entity\NPCEntity;
 use ryzerbe\training\lobby\item\TrainingItemManager;
 use ryzerbe\training\lobby\kit\EnchantCommand;
 use ryzerbe\training\lobby\kit\KitCommand;
@@ -40,6 +40,9 @@ class Training extends PluginBase {
     /** @var Training|null  */
     public static ?Training $instance = null;
 
+    /**
+     * @throws ReflectionException
+     */
     public function onEnable(){
         self::$instance = $this;
 

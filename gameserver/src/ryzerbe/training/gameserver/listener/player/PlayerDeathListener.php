@@ -2,10 +2,10 @@
 
 namespace ryzerbe\training\gameserver\listener\player;
 
-use baubolp\core\provider\LanguageProvider;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\Player;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\gameserver\session\SessionManager;
 
 class PlayerDeathListener implements Listener {

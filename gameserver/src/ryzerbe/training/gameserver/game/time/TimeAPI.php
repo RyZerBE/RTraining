@@ -43,7 +43,7 @@ class TimeAPI {
         return new TimeFormat(intval($years), intval($months), intval($days), intval($hours), intval($minutes), intval($seconds));
     }
 
-    public static function isTimeValid(int $time){
+    public static function isTimeValid(int $time): bool{
         if($time != 0){
             $c = $time - time();
             if($c <= 0){

@@ -13,6 +13,7 @@ use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ReflectionException;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\Minigame;
@@ -30,6 +31,9 @@ use function mt_rand;
 class AimTrainerMinigame extends Minigame {
     private Level $level;
 
+    /**
+     * @throws ReflectionException
+     */
     public function __construct(){
         parent::__construct();
 

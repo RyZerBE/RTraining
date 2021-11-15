@@ -2,9 +2,9 @@
 
 namespace ryzerbe\training\lobby\player\setting;
 
-use baubolp\core\provider\AsyncExecutor;
 use mysqli;
 use pocketmine\Player;
+use ryzerbe\core\util\async\AsyncExecutor;
 
 class PlayerSettings {
 

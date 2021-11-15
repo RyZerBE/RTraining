@@ -2,8 +2,6 @@
 
 namespace ryzerbe\training\lobby\kit;
 
-use baubolp\core\provider\AsyncExecutor;
-use baubolp\core\provider\LanguageProvider;
 use mysqli;
 use pocketmine\entity\Effect;
 use pocketmine\entity\EffectInstance;
@@ -11,7 +9,8 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\SingletonTrait;
-use pocketmine\utils\TextFormat;
+use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\lobby\Training;
 use function base64_decode;
 use function base64_encode;

@@ -2,10 +2,10 @@
 
 namespace ryzerbe\training\lobby\listener\player;
 
-use baubolp\core\listener\own\RyZerPlayerAuthEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Server;
+use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
 use ryzerbe\training\lobby\item\TrainingItemManager;
 use ryzerbe\training\lobby\player\TrainingPlayer;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;

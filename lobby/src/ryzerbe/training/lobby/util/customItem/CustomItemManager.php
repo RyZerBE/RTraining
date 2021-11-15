@@ -65,6 +65,7 @@ class CustomItemManager {
 
     /**
      * @param CustomItem[] $customItems
+     * @throws ReflectionException
      */
     public function registerAll(array $customItems): void{
         foreach($customItems as $item)

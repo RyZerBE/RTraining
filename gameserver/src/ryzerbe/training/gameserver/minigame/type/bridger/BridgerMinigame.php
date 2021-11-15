@@ -2,7 +2,6 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\bridger;
 
-use baubolp\core\provider\LanguageProvider;
 use pocketmine\block\BlockIds;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -14,6 +13,8 @@ use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ReflectionException;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\Minigame;
@@ -45,6 +46,9 @@ class BridgerMinigame extends Minigame {
 
     private Level $level;
 
+    /**
+     * @throws ReflectionException
+     */
     public function __construct(){
         parent::__construct();
         CustomItemManager::getInstance()->registerAll([

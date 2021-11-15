@@ -2,12 +2,13 @@
 
 namespace ryzerbe\training\gameserver\module\setup;
 
-use baubolp\core\util\ItemUtils;
 use pocketmine\block\BlockIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use ReflectionException;
+use ryzerbe\core\util\ItemUtils;
 use ryzerbe\training\gameserver\module\Module;
 use ryzerbe\training\gameserver\module\setup\arena\SetupArena;
 use ryzerbe\training\gameserver\module\setup\command\SetupCommand;
@@ -24,6 +25,9 @@ class SetupModule extends Module {
 
     private ?SetupArena $arena = null;
 
+    /**
+     * @throws ReflectionException
+     */
     public function onLoad(): void{
         Server::getInstance()->getCommandMap()->registerAll("training", [
             new SetupCommand()

@@ -2,8 +2,8 @@
 
 namespace ryzerbe\training\lobby\team;
 
-use baubolp\core\provider\LanguageProvider;
 use pocketmine\Player;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\lobby\player\TrainingPlayer;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\Training;

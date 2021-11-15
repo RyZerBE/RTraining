@@ -2,7 +2,6 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\clutches;
 
-use baubolp\core\provider\LanguageProvider;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -16,6 +15,8 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ReflectionException;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\Minigame;
@@ -37,6 +38,9 @@ use function number_format;
 class ClutchesMinigame extends Minigame {
     private Level $level;
 
+    /**
+     * @throws ReflectionException
+     */
     public function __construct(){
         parent::__construct();
 

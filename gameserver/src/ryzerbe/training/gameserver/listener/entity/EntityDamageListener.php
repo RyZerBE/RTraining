@@ -2,13 +2,13 @@
 
 namespace ryzerbe\training\gameserver\listener\entity;
 
-use baubolp\core\provider\AsyncExecutor;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\Player;
 use pocketmine\Server;
+use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\session\SessionManager;
 

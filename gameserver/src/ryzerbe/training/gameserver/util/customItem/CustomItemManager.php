@@ -5,6 +5,7 @@ namespace ryzerbe\training\gameserver\util\customItem;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use ReflectionClass;
+use ReflectionException;
 use ryzerbe\training\gameserver\Training;
 
 class CustomItemManager {
@@ -20,6 +21,9 @@ class CustomItemManager {
         return $this->customItems;
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function registerCustomItem(CustomItem $item): void {
         $reflection = new ReflectionClass($item::class);
         $item->setName($reflection->getShortName());

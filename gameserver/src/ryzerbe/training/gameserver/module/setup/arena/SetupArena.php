@@ -2,10 +2,10 @@
 
 namespace ryzerbe\training\gameserver\module\setup\arena;
 
-use baubolp\core\util\LocationUtils;
 use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\utils\Config;
+use ryzerbe\core\util\LocationUtils;
 use ryzerbe\training\gameserver\minigame\Minigame;
 use ryzerbe\training\gameserver\Training;
 use function is_dir;

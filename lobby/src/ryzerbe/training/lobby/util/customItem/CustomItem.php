@@ -2,9 +2,9 @@
 
 namespace ryzerbe\training\lobby\util\customItem;
 
-use baubolp\core\util\ItemUtils;
 use pocketmine\event\Listener;
 use pocketmine\item\Item;
+use ryzerbe\core\util\ItemUtils;
 use function uniqid;
 
 abstract class CustomItem implements Listener {

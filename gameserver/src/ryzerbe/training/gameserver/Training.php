@@ -67,6 +67,9 @@ class Training extends PluginBase {
         }
     }
 
+    /**
+     * @throws ReflectionException
+     */
     private function initCustomItems(): void{
         $items = [
             new MinigameHubItem(Item::get(ItemIds::IRON_DOOR)->setCustomName(TextFormat::RED."Leave"), 5),

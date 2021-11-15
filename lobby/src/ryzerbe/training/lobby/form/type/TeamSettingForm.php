@@ -2,10 +2,10 @@
 
 namespace ryzerbe\training\lobby\form\type;
 
-use baubolp\core\provider\LanguageProvider;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\lobby\form\Form;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use function implode;

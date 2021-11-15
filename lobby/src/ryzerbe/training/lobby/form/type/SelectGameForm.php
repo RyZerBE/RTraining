@@ -2,20 +2,14 @@
 
 namespace ryzerbe\training\lobby\form\type;
 
-use BauboLP\Cloud\CloudBridge;
-use BauboLP\Cloud\Packets\MatchPacket;
-use baubolp\core\provider\LanguageProvider;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
-use ryzerbe\training\lobby\challenge\Challenge;
-use ryzerbe\training\lobby\challenge\ChallengeManager;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\lobby\form\Form;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\Training;
-use function count;
-use function json_encode;
 
 class SelectGameForm extends Form {
 

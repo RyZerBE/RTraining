@@ -2,12 +2,12 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp\kits;
 
-use baubolp\core\provider\AsyncExecutor;
 use mysqli;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\SingletonTrait;
+use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\gameserver\session\SessionManager;
 use function base64_decode;
 use function base64_encode;
@@ -32,7 +32,7 @@ class KitManager {
         return $this->kits;
     }
 
-    public function getKitByName(string $kitName){
+    public function getKitByName(string $kitName): ?Kit{
         return $this->kits[$kitName] ?? null;
     }
 

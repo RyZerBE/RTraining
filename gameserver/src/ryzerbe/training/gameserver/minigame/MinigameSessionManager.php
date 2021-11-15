@@ -2,9 +2,9 @@
 
 namespace ryzerbe\training\gameserver\minigame;
 
-use baubolp\core\provider\AsyncExecutor;
 use mysqli;
 use pocketmine\Player;
+use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\gameserver\session\Session;
 use function time;
 

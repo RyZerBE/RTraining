@@ -6,6 +6,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
+use ReflectionException;
 use ryzerbe\training\lobby\item\type\ChallengeItem;
 use ryzerbe\training\lobby\item\type\HubItem;
 use ryzerbe\training\lobby\item\type\TeamItem;
@@ -36,6 +37,9 @@ class TrainingItemManager {
         $this->items[] = $customItem;
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function registerItems(): void{
         $items = [
             new ChallengeItem(Item::get(ItemIds::IRON_SWORD)->setCustomName(TextFormat::GOLD."Challenger"), 4),

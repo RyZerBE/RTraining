@@ -3,7 +3,6 @@
 namespace ryzerbe\training\lobby\scheduler;
 
 use pocketmine\scheduler\Task;
-use pocketmine\Server;
 use ryzerbe\training\lobby\challenge\ChallengeManager;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\queue\QueueManager;

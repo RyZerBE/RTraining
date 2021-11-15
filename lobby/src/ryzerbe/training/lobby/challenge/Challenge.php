@@ -4,17 +4,13 @@ namespace ryzerbe\training\lobby\challenge;
 
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\MatchPacket;
-use baubolp\core\provider\LanguageProvider;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\lobby\player\TrainingPlayer;
 use ryzerbe\training\lobby\team\Team;
 use ryzerbe\training\lobby\Training;
 use function time;
 
 class Challenge {
-    /** @var TrainingPlayer */
-    private TrainingPlayer $thisr;
-    /** @var string */
-    private string $thisdPlayer;
 
     /** @var Team|null  */
     private ?Team $team;
@@ -25,17 +21,14 @@ class Challenge {
     /** @var string  */
     private string $miniGameName;
 
-    /**
-     * @param TrainingPlayer $thisr
-     * @param string $thisdPlayer
-     * @param string $miniGameName
-     * @param Team|null $team
-     */
-    public function __construct(TrainingPlayer $thisr, string $thisdPlayer, string $miniGameName, ?Team $team){
-        $this->challenger = $thisr;
+    private TrainingPlayer $challenger;
+    private string $challengedPlayer;
+
+    public function __construct(TrainingPlayer $challenger, string $challengedPlayer, string $miniGameName, ?Team $team){
+        $this->challenger = $challenger;
         $this->team = $team;
         $this->createdTime = time();
-        $this->challengedPlayer = $thisdPlayer;
+        $this->challengedPlayer = $challengedPlayer;
         $this->miniGameName = $miniGameName;
     }
 

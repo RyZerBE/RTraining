@@ -2,10 +2,10 @@
 
 namespace ryzerbe\training\lobby\item\type;
 
-use baubolp\core\provider\LanguageProvider;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\player\PlayerInteractEntityEvent;
 use pocketmine\Player;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\lobby\form\type\SelectGameForm;
 use ryzerbe\training\lobby\form\type\TeamRequestForm;
 use ryzerbe\training\lobby\item\TrainingItem;
