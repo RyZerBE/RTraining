@@ -15,6 +15,8 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\customItem\CustomItemManager;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\Minigame;
@@ -22,7 +24,6 @@ use ryzerbe\training\gameserver\minigame\type\bridger\generator\BridgerGenerator
 use ryzerbe\training\gameserver\minigame\type\bridger\item\BridgerMinigameConfigurationItem;
 use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\session\SessionManager;
-use ryzerbe\training\gameserver\util\customItem\CustomItemManager;
 use ryzerbe\training\gameserver\util\MinigameDefaultSlots;
 use function in_array;
 use function mt_rand;
@@ -89,6 +90,7 @@ class BridgerMinigame extends Minigame {
         /** @var BridgerGameSession $gameSession */
         $gameSession = $session->getGameSession();
 
+        /** @var PMMPPlayer $player */
         $player = $session->getPlayer();
         if($player === null) return;
 
@@ -97,8 +99,8 @@ class BridgerMinigame extends Minigame {
         $player->setGamemode(Player::SURVIVAL);
 
         $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, Item::get(BlockIds::SANDSTONE, 0, 64));
-        CustomItemManager::getInstance()->getCustomItemByClass(BridgerMinigameConfigurationItem::class)?->giveItem($player, MinigameDefaultSlots::SLOT_CONFIGURATION_ITEM);
-        CustomItemManager::getInstance()->getCustomItemByClass(MinigameHubItem::class)?->giveItem($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
+        CustomItemManager::getInstance()->getCustomItemByClass(BridgerMinigameConfigurationItem::class)?->giveToPlayer($player, MinigameDefaultSlots::SLOT_CONFIGURATION_ITEM);
+        CustomItemManager::getInstance()->getCustomItemByClass(MinigameHubItem::class)?->giveToPlayer($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
 
         $gameSession->sendScoreboard();
         $this->scheduleUpdate($session);

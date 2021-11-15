@@ -4,6 +4,7 @@ namespace ryzerbe\training\lobby\listener\player;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerToggleSneakEvent;
+use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\training\lobby\item\TrainingItemManager;
 use ryzerbe\training\lobby\kit\KitManager;
 
@@ -13,6 +14,7 @@ class PlayerSneakListener implements Listener {
      * @param PlayerToggleSneakEvent $event
      */
     public function onSneak(PlayerToggleSneakEvent $event){
+        /** @var PMMPPlayer $player */
         $player = $event->getPlayer();
         $kitName = KitManager::getInstance()->sort[$player->getName()] ?? null;
         if($kitName === null) return;
@@ -23,7 +25,7 @@ class PlayerSneakListener implements Listener {
         $player->getInventory()->clearAll();
 
         foreach(TrainingItemManager::getInstance()->getItems() as $trainingItem) {
-            $trainingItem->giveItem($player);
+            $trainingItem->giveToPlayer($player);
         }
         $player->getInventory()->setHeldItemIndex(4);
         $player->setImmobile(false);

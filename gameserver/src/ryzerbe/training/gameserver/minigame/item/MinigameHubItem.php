@@ -2,26 +2,18 @@
 
 namespace ryzerbe\training\gameserver\minigame\item;
 
-use pocketmine\event\player\PlayerInteractEvent;
-use ryzerbe\training\gameserver\util\customItem\TrainingItem;
+use pocketmine\item\Item;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\customItem\CustomItem;
 
-class MinigameHubItem extends TrainingItem {
-
-    public function getSlot(): int{
-        return 5;
-    }
-
-    /**
-     * @param PlayerInteractEvent $event
-     */
-    public function onInteract(PlayerInteractEvent $event){
-        $player = $event->getPlayer();
-        $item = $player->getInventory()->getItemInHand();
-        if(!$this->checkItem($item)) return;
-        if($player->hasItemCooldown($item)) return;
+class MinigameHubItem extends CustomItem {
+    public function onInteract(PMMPPlayer $player, Item $item): void{
         $player->resetItemCooldown($item, 60);
 
-        $event->setCancelled();
         $player->getServer()->dispatchCommand($player, "leave");
+    }
+
+    public function getSlot(): ?int{
+        return 5;
     }
 }

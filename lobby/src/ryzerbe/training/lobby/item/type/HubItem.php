@@ -3,19 +3,12 @@
 namespace ryzerbe\training\lobby\item\type;
 
 use BauboLP\Cloud\CloudBridge;
-use pocketmine\event\player\PlayerInteractEvent;
-use ryzerbe\training\lobby\item\TrainingItem;
+use pocketmine\item\Item;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\customItem\CustomItem;
 
-class HubItem extends TrainingItem {
-
-    /**
-     * @param PlayerInteractEvent $event
-     */
-    public function onInteract(PlayerInteractEvent $event){
-        $player = $event->getPlayer();
-        $item = $player->getInventory()->getItemInHand();
-        if(!$this->checkItem($item)) return;
-        if($player->hasItemCooldown($item)) return;
+class HubItem extends CustomItem {
+    public function onInteract(PMMPPlayer $player, Item $item): void{
         $player->resetItemCooldown($item, 20);
 
         CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "hub");

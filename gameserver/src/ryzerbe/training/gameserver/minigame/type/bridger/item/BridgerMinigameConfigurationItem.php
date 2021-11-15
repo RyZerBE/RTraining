@@ -2,23 +2,19 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\bridger\item;
 
-use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\item\Item;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\customItem\CustomItem;
 use ryzerbe\training\gameserver\minigame\type\bridger\form\BridgerMinigameConfigurationForm;
-use ryzerbe\training\gameserver\util\customItem\TrainingItem;
 
-class BridgerMinigameConfigurationItem extends TrainingItem {
-
-    public function getSlot(): int{
-        return 8;
-    }
-
-    public function onInteract(PlayerInteractEvent $event){
-        $player = $event->getPlayer();
-        $item = $player->getInventory()->getItemInHand();
-        if(!$this->checkItem($item)) return;
-        if($player->hasItemCooldown($item)) return;
+class BridgerMinigameConfigurationItem extends CustomItem {
+    public function onInteract(PMMPPlayer $player, Item $item): void{
         $player->resetItemCooldown($item, 20);
 
         BridgerMinigameConfigurationForm::open($player);
+    }
+
+    public function getSlot(): ?int{
+        return 8;
     }
 }

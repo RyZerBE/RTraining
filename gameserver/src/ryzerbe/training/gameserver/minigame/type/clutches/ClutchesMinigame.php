@@ -17,6 +17,8 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\customItem\CustomItemManager;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\Minigame;
@@ -27,7 +29,6 @@ use ryzerbe\training\gameserver\minigame\type\clutches\item\ClutchesStopItem;
 use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\session\SessionManager;
 use ryzerbe\training\gameserver\Training;
-use ryzerbe\training\gameserver\util\customItem\CustomItemManager;
 use ryzerbe\training\gameserver\util\MinigameDefaultSlots;
 use function array_values;
 use function count;
@@ -148,6 +149,7 @@ class ClutchesMinigame extends Minigame {
         /** @var ClutchesGameSession $gameSession */
         $gameSession = $session->getGameSession();
 
+        /** @var PMMPPlayer $player */
         $player = $session->getPlayer();
         if($player === null) return;
 
@@ -166,8 +168,8 @@ class ClutchesMinigame extends Minigame {
         /** @var MinigameHubItem|null $leaveItem */
         $leaveItem = CustomItemManager::getInstance()->getCustomItemByClass(MinigameHubItem::class);
 
-        $leaveItem?->giveItem($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
-        $startItem?->giveItem($player, MinigameDefaultSlots::SLOT_OTHER_ITEM);
+        $leaveItem?->giveToPlayer($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
+        $startItem?->giveToPlayer($player, MinigameDefaultSlots::SLOT_OTHER_ITEM);
 
         $gameSession->sendScoreboard();
         $this->scheduleUpdate($session);

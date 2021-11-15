@@ -7,6 +7,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
+use ryzerbe\core\util\customItem\CustomItemManager;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
 use ryzerbe\training\gameserver\command\EnchantCommand;
 use ryzerbe\training\gameserver\command\KitCommand;
@@ -19,7 +20,6 @@ use ryzerbe\training\gameserver\minigame\type\clutches\ClutchesMinigame;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\KitPvPMinigame;
 use ryzerbe\training\gameserver\module\ModuleManager;
 use ryzerbe\training\gameserver\scheduler\TrainingUpdateTask;
-use ryzerbe\training\gameserver\util\customItem\CustomItemManager;
 
 class Training extends PluginBase {
     public const PREFIX = TextFormat::BLUE.TextFormat::BOLD."Training ".TextFormat::RESET;
@@ -31,7 +31,6 @@ class Training extends PluginBase {
      */
     public function onEnable(): void{
         self::$instance = $this;
-        CustomItemManager::getInstance();
         ModuleManager::getInstance();
 
         ListenerDirectoryLoader::load($this, $this->getFile(), __DIR__ . "/listener/");

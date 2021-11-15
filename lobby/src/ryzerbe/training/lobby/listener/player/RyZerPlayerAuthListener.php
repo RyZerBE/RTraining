@@ -6,6 +6,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Server;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
+use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\training\lobby\item\TrainingItemManager;
 use ryzerbe\training\lobby\player\TrainingPlayer;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
@@ -16,12 +17,13 @@ class RyZerPlayerAuthListener implements Listener {
      * @param RyZerPlayerAuthEvent $event
      */
     public function onAuth(RyZerPlayerAuthEvent $event){
+        /** @var PMMPPlayer $player */
         $player = $event->getRyZerPlayer()->getPlayer();
         $trainingPlayer = new TrainingPlayer($player);
         TrainingPlayerManager::addPlayer($trainingPlayer);
 
         foreach(TrainingItemManager::getInstance()->getItems() as $trainingItem) {
-            $trainingItem->giveItem($player);
+            $trainingItem->giveToPlayer($player);
         }
         $player->getInventory()->setHeldItemIndex(4);
         $player->setImmobile(false);

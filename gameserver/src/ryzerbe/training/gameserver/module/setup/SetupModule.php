@@ -8,6 +8,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use ReflectionException;
+use ryzerbe\core\util\customItem\CustomItemManager;
 use ryzerbe\core\util\ItemUtils;
 use ryzerbe\training\gameserver\module\Module;
 use ryzerbe\training\gameserver\module\setup\arena\SetupArena;
@@ -15,7 +16,6 @@ use ryzerbe\training\gameserver\module\setup\command\SetupCommand;
 use ryzerbe\training\gameserver\module\setup\item\SetupFinishSetupItem;
 use ryzerbe\training\gameserver\module\setup\item\SpectatorPositionSetupItem;
 use ryzerbe\training\gameserver\module\setup\item\TeamSpawnPositionSetupItem;
-use ryzerbe\training\gameserver\util\customItem\CustomItemManager;
 use function mt_rand;
 
 class SetupModule extends Module {

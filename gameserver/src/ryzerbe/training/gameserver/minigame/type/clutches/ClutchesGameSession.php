@@ -7,6 +7,8 @@ use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\customItem\CustomItemManager;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\MinigameSettings;
@@ -14,8 +16,6 @@ use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
 use ryzerbe\training\gameserver\minigame\type\clutches\item\ClutchesStartItem;
 use ryzerbe\training\gameserver\minigame\type\clutches\item\ClutchesStopItem;
 use ryzerbe\training\gameserver\session\Session;
-use ryzerbe\training\gameserver\util\customItem\CustomItemManager;
-use ryzerbe\training\gameserver\util\customItem\TrainingItem;
 use ryzerbe\training\gameserver\util\MinigameDefaultSlots;
 use ryzerbe\training\gameserver\util\ScoreboardUtils;
 
@@ -54,6 +54,7 @@ class ClutchesGameSession extends GameSession {
 
     public function reset(string $clutchesItemName = ClutchesStopItem::class): void{
         $this->resetBlocks();
+        /** @var PMMPPlayer $player */
         $player = $this->getSession()->getPlayer();
         if($player === null) return;
         $inventory = $player->getInventory();
@@ -64,13 +65,12 @@ class ClutchesGameSession extends GameSession {
         if($clutchesItemName !== ClutchesStartItem::class) {
             $inventory->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, Item::get(BlockIds::SANDSTONE, 0, 64));
         }
-        /** @var TrainingItem|null $item */
         $item = CustomItemManager::getInstance()->getCustomItemByClass($clutchesItemName);
-        $item?->giveItem($player, MinigameDefaultSlots::SLOT_OTHER_ITEM);
+        $item?->giveToPlayer($player, MinigameDefaultSlots::SLOT_OTHER_ITEM);
 
         /** @var MinigameHubItem|null $leaveItem */
         $leaveItem = CustomItemManager::getInstance()->getCustomItemByClass(MinigameHubItem::class);
-        $leaveItem?->giveItem($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
+        $leaveItem?->giveToPlayer($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
 
         $this->lastHit = 0;
         $this->lastBlock = 0;

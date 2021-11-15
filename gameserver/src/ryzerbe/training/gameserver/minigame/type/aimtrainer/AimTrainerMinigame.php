@@ -14,6 +14,8 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\customItem\CustomItemManager;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\Minigame;
@@ -23,7 +25,6 @@ use ryzerbe\training\gameserver\minigame\type\aimtrainer\item\AimTrainerConfigur
 use ryzerbe\training\gameserver\minigame\type\aimtrainer\item\AimTrainerResetItem;
 use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\session\SessionManager;
-use ryzerbe\training\gameserver\util\customItem\CustomItemManager;
 use ryzerbe\training\gameserver\util\MinigameDefaultSlots;
 use function in_array;
 use function mt_rand;
@@ -91,14 +92,15 @@ class AimTrainerMinigame extends Minigame {
         /** @var AimTrainerGameSession $gameSession */
         $gameSession = $session->getGameSession();
 
+        /** @var PMMPPlayer $player */
         $player = $session->getPlayer();
         if($player === null) return;
 
         $player->teleport($gameSession->getSpawn());
         $player->setImmobile(false);
 
-        CustomItemManager::getInstance()->getCustomItemByClass(AimTrainerConfigurationItem::class)?->giveItem($player, MinigameDefaultSlots::SLOT_CONFIGURATION_ITEM);
-        CustomItemManager::getInstance()->getCustomItemByClass(MinigameHubItem::class)?->giveItem($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
+        CustomItemManager::getInstance()->getCustomItemByClass(AimTrainerConfigurationItem::class)?->giveToPlayer($player, MinigameDefaultSlots::SLOT_CONFIGURATION_ITEM);
+        CustomItemManager::getInstance()->getCustomItemByClass(MinigameHubItem::class)?->giveToPlayer($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
 
         $gameSession->sendScoreboard();
         $this->scheduleUpdate($session);
