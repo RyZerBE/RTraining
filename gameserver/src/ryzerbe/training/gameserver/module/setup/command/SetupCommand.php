@@ -79,7 +79,7 @@ class SetupCommand extends Command {
 
         if(!is_dir("worlds/".$level)){
             if(!is_dir("/root/RyzerCloud/data/MapDownloader/" . $level)) {
-                $sender->sendMessage("§8» §r§7Unknown map " . $level , ".");
+                $sender->sendMessage("§8» §r§7Unknown map " . $level . ".");
                 return;
             }
 
