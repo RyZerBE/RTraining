@@ -20,4 +20,12 @@ class QueueManager {
     public function registerQueue(Queue $queue): void {
         $this->queues[$queue->getMinigame()] = $queue;
     }
+
+    public function registerQueues(Queue... $queues): void {
+        foreach($queues as $queue) $this->registerQueue($queue);
+    }
+
+    public function getQueue(string $minigame): ?Queue {
+        return $this->queues[$minigame] ?? null;
+    }
 }

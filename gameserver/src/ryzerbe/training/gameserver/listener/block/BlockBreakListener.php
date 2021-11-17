@@ -6,6 +6,7 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\session\SessionManager;
+use function in_array;
 use function method_exists;
 
 class BlockBreakListener implements Listener {
@@ -22,6 +23,7 @@ class BlockBreakListener implements Listener {
             $event->setCancelled();
             return;
         }
+        if(in_array($block->getId(), $minigame->getSettings()->breakList)) return;
         $event->setCancelled(!$minigame->getSettings()->canBreak);
         if($minigame->getSettings()->onlyPlacedBreak) {
             $session = SessionManager::getInstance()->getSessionOfPlayer($player);

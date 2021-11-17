@@ -6,23 +6,14 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\training\gameserver\minigame\MinigameSettings;
 
 class MLGRushSettings extends MinigameSettings {
-
-    /** @var bool  */
-    public bool $canPlace = true;
-    /** @var bool  */
-    public bool $onlyPlacedBreak = true;
-    /** @var bool  */
-    public bool $canBreak = true;
-    /** @var bool  */
-    public bool $pvp = true;
-    /** @var bool  */
-    public bool $canInteract = true;
-    /** @var bool  */
-    public bool $damage = true;
-    /** @var int  */
-    public int $maxPlayers = 8;
-    /** @var bool  */
-    public bool $inventoryTransactions = true;
-    /** @var string  */
     public string $PREFIX = TextFormat::LIGHT_PURPLE.TextFormat::BOLD."M".TextFormat::WHITE."L".TextFormat::LIGHT_PURPLE."GRush ".TextFormat::RESET;
+    public int $maxPlayers = PHP_INT_MAX;
+    public bool $canPlace = true;
+    public bool $onlyPlacedBreak = true;
+    public bool $canBreak = true;
+    public bool $pvp = true;
+    public bool $canInteract = true;
+    public bool $damage = true;
+    public bool $inventoryTransactions = true;
+    public bool $itemPickup = true;
 }

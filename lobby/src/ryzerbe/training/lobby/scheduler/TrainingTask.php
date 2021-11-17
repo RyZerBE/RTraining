@@ -14,9 +14,13 @@ class TrainingTask extends Task {
      * @param int $currentTick
      */
     public function onRun(int $currentTick){
-        foreach(ChallengeManager::getInstance()->getChallenges() as $challenge) {
-            if($challenge->isValid()) continue;
-            $challenge->remove();
+        if($currentTick % 20 === 0) {
+            foreach(ChallengeManager::getInstance()->getChallenges() as $player => $__player) {
+                foreach(ChallengeManager::getInstance()->getPlayerChallenges($player) as $challenge) {
+                    if($challenge->isValid()) continue;
+                    $challenge->remove();
+                }
+            }
         }
 
         foreach(TrainingPlayerManager::getPlayers() as $trainingPlayer) {

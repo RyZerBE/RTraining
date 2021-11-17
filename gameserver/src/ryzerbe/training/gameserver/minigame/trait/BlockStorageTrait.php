@@ -17,6 +17,11 @@ trait BlockStorageTrait {
         unset($this->blocks[$identifier][$hash]);
     }
 
+    public function isBlock(Block|int $hash, string $identifier = "default"): bool {
+        if($hash instanceof Block) $hash = Level::blockHash($hash->x, $hash->y, $hash->z);
+        return isset($this->blocks[$identifier][$hash]);
+    }
+
     public function resetBlocks(string $identifier = "default"): void {
         foreach(($this->blocks[$identifier] ?? []) as $position) {
             $position->getLevel()->setBlockIdAt($position->x, $position->y, $position->z, 0);

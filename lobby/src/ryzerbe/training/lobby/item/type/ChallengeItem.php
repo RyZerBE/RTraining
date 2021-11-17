@@ -6,7 +6,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\player\PlayerInteractEntityEvent;
 use pocketmine\Player;
 use ryzerbe\core\language\LanguageProvider;
-use ryzerbe\core\util\customItem\CustomItem;
+use ryzerbe\core\util\customitem\CustomItem;
 use ryzerbe\training\lobby\form\type\SelectGameForm;
 use ryzerbe\training\lobby\form\type\TeamRequestForm;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;

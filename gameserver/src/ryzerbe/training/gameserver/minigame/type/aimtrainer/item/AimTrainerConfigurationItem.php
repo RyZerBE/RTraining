@@ -4,7 +4,7 @@ namespace ryzerbe\training\gameserver\minigame\type\aimtrainer\item;
 
 use pocketmine\item\Item;
 use ryzerbe\core\player\PMMPPlayer;
-use ryzerbe\core\util\customItem\CustomItem;
+use ryzerbe\core\util\customitem\CustomItem;
 use ryzerbe\training\gameserver\minigame\type\aimtrainer\form\AimTrainerConfigurationForm;
 
 class AimTrainerConfigurationItem extends CustomItem {

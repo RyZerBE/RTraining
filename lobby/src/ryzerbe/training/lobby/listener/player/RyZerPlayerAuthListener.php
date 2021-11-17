@@ -34,7 +34,7 @@ class RyZerPlayerAuthListener implements Listener {
         $player = $event->getPlayer();
         $event->setJoinMessage("");
         $player->getInventory()->clearAll();
-        $player->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn()->add(0, 1));
+        $player->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn()->add(0.5, 1, 0.5), 180, 0);
         $player->setImmobile(true);
     }
 }

@@ -15,7 +15,7 @@ class GameSession {
     public function __construct(Session $session, ?Level $level){
         $this->session = $session;
         $this->level = $level;
-        $this->settings = $this->getSession()->getMinigame()->getSettings();
+        $this->settings = clone $this->getSession()->getMinigame()->getSettings();
     }
 
     public function getLevel(): ?Level{

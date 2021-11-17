@@ -7,17 +7,10 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
-use ryzerbe\training\lobby\form\Form;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\Training;
 
-class SelectGameForm extends Form {
-
-    /**
-     * @param Player $player
-     * @param array $extraData
-     * @return void
-     */
+class SelectGameForm {
     public static function open(Player $player, array $extraData = []): void{
         $trainingPlayer = TrainingPlayerManager::getPlayer($player);
         if($trainingPlayer === null) return;
@@ -60,6 +53,7 @@ class SelectGameForm extends Form {
 
         $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Select Game");
         $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::BLUE.TextFormat::BOLD." KitPvP", -1, "", "KitPvP");
+        $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::BLUE.TextFormat::BOLD." MLGRush", -1, "", "MLGRush");
         $form->sendToPlayer($player);
     }
 }

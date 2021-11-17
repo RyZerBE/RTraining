@@ -7,7 +7,6 @@ use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\Player;
-use function rand;
 use function str_repeat;
 
 class ScoreboardUtils {
@@ -17,7 +16,7 @@ class ScoreboardUtils {
         $entry = new ScorePacketEntry();
         $entry->objectiveName = $objName;
         $entry->type = 3;
-        $entry->customName = "§".rand(0, 9)."§".rand(0, 9).str_repeat(" ", 1) . $msg . str_repeat("  ", 2);
+        $entry->customName = "§".$score.($score > 9 ? "§".$score : "").str_repeat(" ", 1)."§r".$msg.str_repeat("  ", 2);
         $entry->score = $score;
         $entry->scoreboardId = $score;
 

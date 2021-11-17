@@ -15,7 +15,7 @@ class EntityDamageListener implements Listener {
 
         $event->setCancelled();
         if($event->getCause() === EntityDamageEvent::CAUSE_VOID || $event->getCause() === EntityDamageEvent::CAUSE_SUFFOCATION) {
-            $event->getEntity()->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn()->add(0, 1));
+            $event->getEntity()->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn()->add(0.5, 1, 0.5), 180, 0);
         }
     }
 }

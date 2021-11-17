@@ -135,13 +135,13 @@ class TrainingPlayer {
     public function challenge(TrainingPlayer $challenger, string $miniGameName){
         $manager = ChallengeManager::getInstance();
 
-        if($manager->hasChallenged($challenger->getPlayer(), $this->getPlayer()) !== null){
+        if($manager->hasChallenged($challenger->getPlayer(), $this->getPlayer(), $miniGameName) !== null){
             $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-already-challenged", $challenger->getPlayer()->getName(), ["#player" => $this->getPlayer()->getName()]));
             return;
         }
 
-        $challenge = $manager->hasChallenged($this->getPlayer(), $challenger->getPlayer());
-        if($challenge !== null && $challenge->getMiniGameName() === $miniGameName){
+        $challenge = $manager->hasChallenged($this->getPlayer(), $challenger->getPlayer(), $miniGameName);
+        if($challenge !== null){
             if($this->getTeam() !== null) {
                 if($challenger->getTeam() === null) {
                     $challenger->getPlayer()->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-request-invalid",  $challenger->getPlayer()->getName()));

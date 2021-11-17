@@ -5,7 +5,7 @@ namespace ryzerbe\training\gameserver\minigame\type\clutches\item;
 use pocketmine\item\Item;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\player\PMMPPlayer;
-use ryzerbe\core\util\customItem\CustomItem;
+use ryzerbe\core\util\customitem\CustomItem;
 use ryzerbe\training\gameserver\minigame\type\clutches\ClutchesGameSession;
 use ryzerbe\training\gameserver\minigame\type\clutches\HitQueue;
 use ryzerbe\training\gameserver\session\SessionManager;

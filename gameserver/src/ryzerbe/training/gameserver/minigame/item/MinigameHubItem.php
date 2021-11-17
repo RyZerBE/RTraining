@@ -4,7 +4,7 @@ namespace ryzerbe\training\gameserver\minigame\item;
 
 use pocketmine\item\Item;
 use ryzerbe\core\player\PMMPPlayer;
-use ryzerbe\core\util\customItem\CustomItem;
+use ryzerbe\core\util\customitem\CustomItem;
 
 class MinigameHubItem extends CustomItem {
     public function onInteract(PMMPPlayer $player, Item $item): void{

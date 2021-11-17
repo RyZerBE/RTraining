@@ -10,6 +10,7 @@ class BlockPlaceListener implements Listener {
      * @param BlockPlaceEvent $event
      */
     public function onPlace(BlockPlaceEvent $event){
+        if($event->getPlayer()->isCreative(true)) return;
         $event->setCancelled();
     }
 }

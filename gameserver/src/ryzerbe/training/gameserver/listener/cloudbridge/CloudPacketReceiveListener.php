@@ -10,7 +10,9 @@ use ryzerbe\training\gameserver\game\match\MatchRequest;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\KitPvPMinigame;
 use ryzerbe\training\gameserver\util\Logger;
+use function boolval;
 use function count;
+use function intval;
 use function json_decode;
 
 class CloudPacketReceiveListener implements Listener{
@@ -36,7 +38,7 @@ class CloudPacketReceiveListener implements Listener{
                     Logger::error("Player count does not match with minigame max players");
                     return;
                 }
-                $request = new MatchRequest($players, $minigameName, (bool)$packet->getValue("elo") ?? false);
+                $request = new MatchRequest($players, $minigameName, boolval(intval($packet->getValue("elo") ?? false)));
 
                 $teams = $packet->getValue("teams");
                 if($teams !== null) {
@@ -50,7 +52,6 @@ class CloudPacketReceiveListener implements Listener{
                         $request->addExtraData("kitName", $kitName);
                     }
                 }
-
                 MatchQueue::addQueue($request);
             }else {
                 Logger::error("Unknown players value given");

@@ -5,6 +5,7 @@ namespace ryzerbe\training\gameserver\minigame\type\kitpvp;
 use pocketmine\utils\TextFormat;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
+use ryzerbe\training\gameserver\minigame\trait\MinigameStatesTrait;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\Kit;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\KitManager;
 use ryzerbe\training\gameserver\util\Countdown;
@@ -12,10 +13,11 @@ use ryzerbe\training\gameserver\util\ScoreboardUtils;
 
 class KitPvPGameSession extends GameSession {
     use BlockStorageTrait;
+    use MinigameStatesTrait;
 
     private ?Countdown $countdown;
     public int $tick = 0;
-    public ?Kit $kit;
+    public ?Kit $kit = null;
 
     public function loadPlayerKits(): void{
         $session = $this->getSession();
@@ -59,7 +61,7 @@ class KitPvPGameSession extends GameSession {
             ScoreboardUtils::setScoreboardEntry($player, 2, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.(KitManager::getInstance()->playerKit[$player->getName()] ?? "???"), "training");
             ScoreboardUtils::setScoreboardEntry($player, 3, "", "training");
             ScoreboardUtils::setScoreboardEntry($player, 4, TextFormat::GRAY."○ Map", "training");
-            ScoreboardUtils::setScoreboardEntry($player, 5, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$this->getSession()->getMinigame()->getMap()->getMap()->getMapName(), "training");
+            ScoreboardUtils::setScoreboardEntry($player, 5, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$this->getSession()->getMinigame()->getMap()->getGameMap()->getMapName(), "training");
             ScoreboardUtils::setScoreboardEntry($player, 6, "", "training");
             ScoreboardUtils::setScoreboardEntry($player, 7, TextFormat::WHITE."⇨ ".TextFormat::AQUA."ryzer.be", "training");
         }

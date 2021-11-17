@@ -11,7 +11,7 @@ use pocketmine\level\Location;
 use pocketmine\level\Position;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\player\PMMPPlayer;
-use ryzerbe\core\util\customItem\CustomItemManager;
+use ryzerbe\core\util\customitem\CustomItemManager;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\MinigameSettings;

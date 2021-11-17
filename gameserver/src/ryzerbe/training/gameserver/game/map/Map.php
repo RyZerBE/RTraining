@@ -7,6 +7,7 @@ use pocketmine\level\Level;
 use pocketmine\Server;
 use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\gameserver\session\Session;
+use function exec;
 use function popen;
 use function uniqid;
 
@@ -26,7 +27,7 @@ class Map {
         return $this->session;
     }
 
-    public function getMap(): GameMap{
+    public function getGameMap(): GameMap{
         return $this->map;
     }
 
@@ -51,6 +52,18 @@ class Map {
             $level->setTime(6000);
             $level->stopTime();
             ($closure)();
+        });
+    }
+
+    public function unload(): void {
+        $level = $this->getLevel();
+        $levelName = $level->getFolderName();
+        if(Server::getInstance()->isLevelLoaded($levelName)){
+            Server::getInstance()->unloadLevel($level);
+        }
+        $dataPath = Server::getInstance()->getDataPath();
+        AsyncExecutor::submitMySQLAsyncTask("Lobby", function() use ($dataPath, $levelName): void {
+            exec("rm -r " . $dataPath . "worlds/" . $levelName);
         });
     }
 }

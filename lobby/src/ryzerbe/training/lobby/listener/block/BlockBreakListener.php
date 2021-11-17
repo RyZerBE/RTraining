@@ -11,6 +11,7 @@ class BlockBreakListener implements Listener {
      * @param BlockBreakEvent $event
      */
     public function onBreak(BlockBreakEvent $event){
+        if($event->getPlayer()->isCreative(true)) return;
         $event->setCancelled();
     }
 }

@@ -18,9 +18,10 @@ class PlayerExhaustListener implements Listener {
         if(!$player instanceof Player) return;
         $minigame = MinigameManager::getMinigameByPlayer($player);
         if($minigame === null) {
-            $event->setCancelled();//TODO: Cancel event?
-            return;
+            $event->setCancelled();
+        } else {
+            $event->setCancelled(!$minigame->getSettings()->hunger);
         }
-        $event->setCancelled(!$minigame->getSettings()->hunger);
+        if($event->isCancelled()) $player->setFood(20.0);
     }
 }

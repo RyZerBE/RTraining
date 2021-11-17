@@ -16,6 +16,7 @@ abstract class MinigameSettings {
     public bool $itemPickup = false;
     public bool $canPlace = false;
     public bool $canBreak = false;
+    public array $breakList = [];
     public bool $onlyPlacedBreak = false;
     public bool $canInteract = false;
     public bool $inventoryTransactions = false;

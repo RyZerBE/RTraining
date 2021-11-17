@@ -93,11 +93,13 @@ class MatchRequest {
         foreach($session->getOnlinePlayers() as $player) {
             $player->sendTitle(TextFormat::GREEN."Session found", TextFormat::GRAY."loading game..");
             $player->playSound("random.levelup", 5.0, 1.0, [$player]);
+            $player->removeAllEffects();
         }
 
         $gameSession = $session->getGameSession();
         $gameSession->getSettings()->elo = $this->elo;
         MatchQueue::removeQueue($this);
+        $minigame->onLoad($session);
     }
 
     public function getExtraData(): array{

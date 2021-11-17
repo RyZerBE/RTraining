@@ -6,6 +6,7 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use ryzerbe\training\gameserver\minigame\MinigameSettings;
 use ryzerbe\training\gameserver\session\Session;
+use function array_filter;
 use function count;
 
 class Team {
@@ -16,6 +17,8 @@ class Team {
 
     /** @var Player[]  */
     private array $players = [];
+
+    private int $elo = 1000;
 
     public function __construct(Session $session, string $name, string $color) {
         $this->session = $session;
@@ -69,7 +72,17 @@ class Team {
     }
 
     public function isAlive(): bool {
-        return count($this->getPlayers()) > 0;
+        return count(array_filter($this->getPlayers(), function(Player $player): bool {
+                return $player->isConnected();
+            })) > 0;
+    }
+
+    public function getElo(): int{
+        return $this->elo;
+    }
+
+    public function setElo(int $elo): void{
+        $this->elo = $elo;
     }
 
     public function getBlockMeta(): int {

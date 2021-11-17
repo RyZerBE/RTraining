@@ -8,7 +8,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use ReflectionException;
-use ryzerbe\core\util\customItem\CustomItemManager;
+use ryzerbe\core\util\customitem\CustomItemManager;
 use ryzerbe\core\util\ItemUtils;
 use ryzerbe\training\gameserver\module\Module;
 use ryzerbe\training\gameserver\module\setup\arena\SetupArena;

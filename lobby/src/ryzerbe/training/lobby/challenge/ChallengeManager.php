@@ -12,36 +12,28 @@ class ChallengeManager {
     /** @var Challenge[][]  */
     public array $challenges = [];
 
-    /**
-     * @param TrainingPlayer $challengedPlayer
-     * @param Challenge $challenge
-     */
     public function addChallenge(TrainingPlayer $challengedPlayer, Challenge $challenge){
         $this->challenges[$challengedPlayer->getPlayer()->getName()][$challenge->getChallenger()->getPlayer()->getName()] = $challenge;
     }
 
-    /**
-     * @param Player|string $challenger
-     * @param Player|string $enemy
-     * @return Challenge|null
-     */
-    public function hasChallenged(Player|string $challenger, Player|string $enemy): ?Challenge{
+    public function hasChallenged(Player|string $challenger, Player|string $enemy, ?string $minigame = null): ?Challenge{
         if($challenger instanceof Player) $challenger = $challenger->getName();
         if($enemy instanceof Player) $enemy = $enemy->getName();
-
-        return $this->challenges[$enemy][$challenger] ?? null;
+        $challenge = $this->challenges[$enemy][$challenger] ?? null;
+        if($challenge === null) return null;
+        if($minigame !== null){
+            if($challenge->getMiniGameName() === $minigame) {
+                return $challenge;
+            }
+            return null;
+        }
+        return $challenge;
     }
 
-    /**
-     * @param string $challengerName
-     * @param string $challengedName
-     */
     public function removeChallenge(string $challengerName, string $challengedName){
         unset($this->challenges[$challengedName][$challengerName]);
     }
-    /**
-     * @return Challenge[]
-     */
+
     public function getChallenges(): array{
         return $this->challenges;
     }
@@ -51,7 +43,6 @@ class ChallengeManager {
      */
     public function getPlayerChallenges(Player|string $player): array{
         if($player instanceof Player) $player = $player->getName();
-
-        return $this->challenges[$player];
+        return $this->challenges[$player] ?? [];
     }
 }

@@ -2,13 +2,15 @@
 
 namespace ryzerbe\training\gameserver;
 
+use pocketmine\block\BlockFactory;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
-use ryzerbe\core\util\customItem\CustomItemManager;
+use ryzerbe\core\util\customitem\CustomItemManager;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
+use ryzerbe\training\gameserver\block\BedBlock;
 use ryzerbe\training\gameserver\command\EnchantCommand;
 use ryzerbe\training\gameserver\command\KitCommand;
 use ryzerbe\training\gameserver\command\LeaveCommand;
@@ -18,6 +20,7 @@ use ryzerbe\training\gameserver\minigame\type\aimtrainer\AimTrainerMinigame;
 use ryzerbe\training\gameserver\minigame\type\bridger\BridgerMinigame;
 use ryzerbe\training\gameserver\minigame\type\clutches\ClutchesMinigame;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\KitPvPMinigame;
+use ryzerbe\training\gameserver\minigame\type\mlgrush\MLGRushMinigame;
 use ryzerbe\training\gameserver\module\ModuleManager;
 use ryzerbe\training\gameserver\scheduler\TrainingUpdateTask;
 
@@ -45,6 +48,8 @@ class Training extends PluginBase {
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(new TrainingUpdateTask(), 1);
+
+        BlockFactory::registerBlock(new BedBlock(), true);
     }
 
     public static function getInstance(): Training{
@@ -57,6 +62,7 @@ class Training extends PluginBase {
             new AimTrainerMinigame(),
             new KitPvPMinigame(),
             new BridgerMinigame(),
+            new MLGRushMinigame(),
         ];
 
         foreach($minigames as $minigame) {

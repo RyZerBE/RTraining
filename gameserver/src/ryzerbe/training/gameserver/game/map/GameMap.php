@@ -44,7 +44,7 @@ class GameMap {
         return $this->teamLocations;
     }
 
-    public function getTeamLocation(string $teamName, Level $level){
+    public function getTeamLocation(string $teamName, Level $level): ?Location{
         $location = $this->getTeamLocations()[$teamName] ?? null;
         if($location === null) return null;
         $location->level = $level;

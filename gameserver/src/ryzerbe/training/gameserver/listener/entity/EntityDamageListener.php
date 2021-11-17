@@ -6,6 +6,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
+use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\Player;
 use pocketmine\Server;
 use ryzerbe\core\util\async\AsyncExecutor;
@@ -62,9 +63,8 @@ class EntityDamageListener implements Listener {
             if($event->isCancelled()) return;
             if($event->getFinalDamage() >= $entity->getHealth()) {
                 $event->setCancelled();
-                $entity->setGamemode(3);
 
-                $ev = new PlayerDeathEvent($entity, $entity->getDrops(), $entity->getXpDropAmount(), 0);
+                $ev = new PlayerDeathEvent($entity, $entity->getDrops(), "DEFAULT", $entity->getXpDropAmount());
                 $ev->call();
 
                 if(!$ev->getKeepInventory()){
@@ -89,7 +89,6 @@ class EntityDamageListener implements Listener {
                     $entity->setSprinting(false);
                     $entity->setSneaking(false);
                     $entity->setFlying(false);
-                    $entity->setGamemode(3);
 
                     $entity->extinguish();
                     $entity->setAirSupplyTicks($entity->getMaxAirSupplyTicks());
@@ -102,6 +101,9 @@ class EntityDamageListener implements Listener {
                     foreach($entity->getAttributeMap()->getAll() as $attr){
                         $attr->resetToDefault();
                     }
+
+                    $ev = new PlayerRespawnEvent($entity, $entity->getLevel()->getSafeSpawn());
+                    $ev->call();
                 });
             }
         } else {

@@ -6,18 +6,12 @@ use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
-use ryzerbe\training\lobby\form\Form;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\team\Team;
 use ryzerbe\training\lobby\team\TeamManager;
 use ryzerbe\training\lobby\Training;
 
-class TeamInviteProgressForm extends Form {
-
-    /**
-     * @param Player $player
-     * @param array $extraData
-     */
+class TeamInviteProgressForm {
     public static function open(Player $player, array $extraData = []): void{
         $trainingPlayer = TrainingPlayerManager::getPlayer($player);
         if($trainingPlayer === null) return;

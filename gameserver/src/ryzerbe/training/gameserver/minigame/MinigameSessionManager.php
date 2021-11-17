@@ -35,7 +35,6 @@ class MinigameSessionManager {
         $this->sessions[$session->getUniqueId()] = $session;
         $minigame = $this->getMinigame();
         $session->setGameSession($minigame->constructGameSession($session));
-        $minigame->onLoad($session);
         $this->time = time();
     }
 

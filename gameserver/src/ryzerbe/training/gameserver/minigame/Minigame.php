@@ -4,6 +4,7 @@ namespace ryzerbe\training\gameserver\minigame;
 
 
 use pocketmine\event\Listener;
+use pocketmine\Server;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\Training;
@@ -22,17 +23,27 @@ abstract class Minigame implements Listener {
 
     /** @var Session[]  */
     protected array $updatingSessions = [];
+    /** @var Session[]  */
+    protected array $scheduledUpdatingSessions = [];
 
     protected MinigameSettings $settings;
     protected MinigameSessionManager $sessionManager;
 
     public function tick(int $currentTick): void {
+        foreach(($this->scheduledUpdatingSessions[$currentTick] ?? []) as $session) {
+            $this->updatingSessions[] = $session;
+        }
+        unset($this->scheduledUpdatingSessions[$currentTick]);
         foreach($this->updatingSessions as $key => $session) {
             if(!$this->onUpdate($session, $currentTick)) unset($this->updatingSessions[$key]);
         }
     }
 
-    public function scheduleUpdate(Session $session): void {
+    public function scheduleUpdate(Session $session, ?int $delay = null): void {
+        if($delay !== null) {
+            $this->scheduledUpdatingSessions[(Server::getInstance()->getTick() + $delay)][] = $session;
+            return;
+        }
         $this->updatingSessions[] = $session;
     }
 

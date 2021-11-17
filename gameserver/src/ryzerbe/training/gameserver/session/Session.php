@@ -108,4 +108,12 @@ class Session {
     public function getTeam(string $team): ?Team {
         return $this->teams[$team] ?? null;
     }
+
+    public function getTeamByPlayer(Player|string $player): ?Team {
+        if($player instanceof Player) $player = $player->getName();
+        foreach($this->getTeams() as $team) {
+            if($team->isPlayer($player)) return $team;
+        }
+        return null;
+    }
 }

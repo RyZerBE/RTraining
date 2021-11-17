@@ -47,8 +47,15 @@ class TimeFormat {
         return $this->seconds;
     }
 
-    public function asString(): string{
+    public function asString(bool $ignoreZeroSeconds = true): string{
         if($this->getTime() === 0) return "Never (Permanent)";
-        return (($this->getYears() !== 0 ? $this->getYears() . " Year" . ($this->getYears() === 1 ? "" : "s") . ", " : "") . ($this->getMonths() !== 0 ? $this->getMonths() . " Month" . ($this->getMonths() === 1 ? "" : "s") . ", " : "") . ($this->getDays() !== 0 ? $this->getDays() . " Day" . ($this->getDays() === 1 ? "" : "s") . ", " : "") . ($this->getHours() !== 0 ? $this->getHours() . " Hour" . ($this->getHours() === 1 ? "" : "s") . ", " : "") . ($this->getMinutes() !== 0 ? $this->getMinutes() . " Minute" . ($this->getMinutes() === 1 ? "" : "s") . ", " : "") . ($this->getSeconds() !== 0 ? $this->getSeconds() . " Second" . ($this->getSeconds() === 1 ? "" : "s") : ""));
+        return (
+            ($this->getYears() !== 0 ? $this->getYears() . " Year" . ($this->getYears() === 1 ? "" : "s") . ", " : "") .
+            ($this->getMonths() !== 0 ? $this->getMonths() . " Month" . ($this->getMonths() === 1 ? "" : "s") . ", " : "") .
+            ($this->getDays() !== 0 ? $this->getDays() . " Day" . ($this->getDays() === 1 ? "" : "s") . ", " : "") .
+            ($this->getHours() !== 0 ? $this->getHours() . " Hour" . ($this->getHours() === 1 ? "" : "s") . ", " : "") .
+            ($this->getMinutes() !== 0 ? $this->getMinutes() . " Minute" . ($this->getMinutes() === 1 ? "" : "s") . ", " : "") .
+            ($this->getSeconds() !== 0 || $ignoreZeroSeconds ? $this->getSeconds() . " Second" . ($this->getSeconds() === 1 ? "" : "s") : "")
+        );
     }
 }

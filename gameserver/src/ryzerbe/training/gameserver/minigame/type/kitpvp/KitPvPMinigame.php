@@ -3,10 +3,9 @@
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp;
 
 use pocketmine\event\player\PlayerDeathEvent;
+use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\level\Location;
-use pocketmine\Server;
 use pocketmine\utils\TextFormat;
-use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\map\GameMap;
 use ryzerbe\training\gameserver\game\map\Map;
@@ -20,7 +19,6 @@ use ryzerbe\training\gameserver\session\SessionManager;
 use ryzerbe\training\gameserver\util\Countdown;
 use ryzerbe\training\gameserver\util\Logger;
 use function count;
-use function exec;
 
 class KitPvPMinigame extends Minigame {
     use MapManagerTrait;
@@ -61,7 +59,7 @@ class KitPvPMinigame extends Minigame {
             if($countdown->hasFinished()) {
                 if($countdown->getState() === Countdown::START) {
                     $gameSession->stopCountdown();
-                    $gameMap = $this->getMap()->getMap();
+                    $gameMap = $this->getMap()->getGameMap();
                     $level = $this->getMap()->getLevel();
                     foreach($session->getTeams() as $team) {
                         $location = $gameMap->getTeamLocation($team->getName(), $level);
@@ -116,7 +114,7 @@ class KitPvPMinigame extends Minigame {
 
         $map = $this->getMap();
         $map->load(function() use ($map, $session, $gameSession): void {
-            $gameMap = $map->getMap();
+            $gameMap = $map->getGameMap();
             $level = $this->getMap()->getLevel();
             $session->getGameSession()->setLevel($level);
             foreach($session->getTeams() as $team) {
@@ -143,17 +141,10 @@ class KitPvPMinigame extends Minigame {
     }
 
     public function onUnload(Session $session): void{
-        $level = $this->getMap()->getLevel();
-        $levelName = $level->getFolderName();
         foreach($session->getOnlinePlayers() as $player) {
             $player->getServer()->dispatchCommand($player, "leave");
         }
-
-        if(Server::getInstance()->isLevelLoaded($levelName)) Server::getInstance()->unloadLevel($level);
-        $dataPath = Server::getInstance()->getDataPath();
-        AsyncExecutor::submitMySQLAsyncTask("Lobby", function() use ($dataPath, $levelName): void {
-            exec("rm -r " . $dataPath . "worlds/" . $levelName);
-        });
+        $this->getMap()->unload();
     }
 
     public function onPlayerDeath(PlayerDeathEvent $event): void {
@@ -169,6 +160,7 @@ class KitPvPMinigame extends Minigame {
             if($team->isPlayer($player)) $team->removePlayer($player);
             if($team->isAlive()) $aliveTeams[] = $team;
         }
+        $player->setGamemode(3);
 
         if(count($aliveTeams) <= 1){
             $winner = $aliveTeams[0] ?? null;
@@ -190,5 +182,13 @@ class KitPvPMinigame extends Minigame {
             }
             $gameSession->startCountdown(8, Countdown::END);
         }
+    }
+
+    public function onPlayerRespawn(PlayerRespawnEvent $event): void {
+        $player = $event->getPlayer();
+        $session = SessionManager::getInstance()->getSessionOfPlayer($player);
+        $gameSession = $session?->getGameSession();
+        if(!$gameSession instanceof KitPvPGameSession || !$gameSession->isRunning()) return;
+        $player->setGamemode(3);
     }
 }

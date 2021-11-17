@@ -8,7 +8,7 @@ use pocketmine\level\Location;
 use pocketmine\level\particle\DustParticle;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use ryzerbe\core\util\customItem\CustomItem;
+use ryzerbe\core\util\customitem\CustomItem;
 use ryzerbe\training\gameserver\module\setup\SetupModule;
 use ryzerbe\training\gameserver\module\setup\util\SetupUtils;
 use function mt_rand;
