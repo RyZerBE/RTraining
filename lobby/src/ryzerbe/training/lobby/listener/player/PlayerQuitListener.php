@@ -4,6 +4,7 @@ namespace ryzerbe\training\lobby\listener\player;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
+use ryzerbe\training\lobby\gamezone\GameZoneManager;
 use ryzerbe\training\lobby\kit\KitManager;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\queue\QueueManager;
@@ -22,6 +23,7 @@ class PlayerQuitListener implements Listener {
 
         $trainingPlayer->getPlayerSettings()->saveToDatabase();
         $trainingPlayer->getTeam()?->leave($trainingPlayer);
+        GameZoneManager::getInstance()->removePlayer($player);
         TrainingPlayerManager::removePlayer($player);
         unset(KitManager::getInstance()->sort[$player->getName()]);
     }

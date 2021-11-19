@@ -4,15 +4,12 @@ namespace ryzerbe\training\lobby\scheduler;
 
 use pocketmine\scheduler\Task;
 use ryzerbe\training\lobby\challenge\ChallengeManager;
+use ryzerbe\training\lobby\gamezone\GameZoneManager;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\queue\QueueManager;
 use function time;
 
 class TrainingTask extends Task {
-
-    /**
-     * @param int $currentTick
-     */
     public function onRun(int $currentTick){
         if($currentTick % 20 === 0) {
             foreach(ChallengeManager::getInstance()->getChallenges() as $player => $__player) {
@@ -33,5 +30,7 @@ class TrainingTask extends Task {
         foreach(QueueManager::getInstance()->getQueues() as $queue) {
             $queue->update();
         }
+
+        GameZoneManager::getInstance()->onUpdate();
     }
 }

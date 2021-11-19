@@ -3,13 +3,13 @@
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp;
 
 use pocketmine\event\player\PlayerDeathEvent;
-use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\level\Location;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\util\TextUtils;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\map\GameMap;
 use ryzerbe\training\gameserver\game\map\Map;
-use ryzerbe\training\gameserver\game\team\Team;
 use ryzerbe\training\gameserver\game\time\TimeAPI;
 use ryzerbe\training\gameserver\minigame\Minigame;
 use ryzerbe\training\gameserver\minigame\trait\MapManagerTrait;
@@ -18,7 +18,6 @@ use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\session\SessionManager;
 use ryzerbe\training\gameserver\util\Countdown;
 use ryzerbe\training\gameserver\util\Logger;
-use function count;
 
 class KitPvPMinigame extends Minigame {
     use MapManagerTrait;
@@ -58,6 +57,7 @@ class KitPvPMinigame extends Minigame {
             }
             if($countdown->hasFinished()) {
                 if($countdown->getState() === Countdown::START) {
+                    $gameSession->setRunning(true);
                     $gameSession->stopCountdown();
                     $gameMap = $this->getMap()->getGameMap();
                     $level = $this->getMap()->getLevel();
@@ -83,7 +83,9 @@ class KitPvPMinigame extends Minigame {
         }
         $gameSession->tick++;
         foreach($session->getOnlinePlayers() as $player) {
-            $player->sendActionBarMessage(TextFormat::GRAY.TimeAPI::convert($gameSession->tick)->asString()."\n".TextFormat::AQUA."discord.ryzer.be");
+            $player->sendActionBarMessage(TextUtils::formatEol(TextFormat::GRAY.TimeAPI::convert($gameSession->tick)->asString()."\n".(
+                    $gameSession->getSettings()->elo ? LanguageProvider::getMessageContainer("elo-enabled", $player) : TextFormat::AQUA."discord.ryzer.be"
+                )));
         }
         return true;
     }
@@ -124,6 +126,7 @@ class KitPvPMinigame extends Minigame {
                     continue;
                 }
                 $color = $team->getColor();
+                $gameSession->loadTeamElo($team, $this->getName());
                 foreach($team->getPlayers() as $player) {
                     $player->setGamemode(0);
                     $player->setHealth($player->getMaxHealth());
@@ -149,46 +152,10 @@ class KitPvPMinigame extends Minigame {
 
     public function onPlayerDeath(PlayerDeathEvent $event): void {
         $player = $event->getPlayer();
-
         $session = SessionManager::getInstance()->getSessionOfPlayer($player);
         $gameSession = $session?->getGameSession();
         if(!$gameSession instanceof KitPvPGameSession) return;
-        if($gameSession->getCountdown()?->getState() === Countdown::END) return;
-
-        $aliveTeams = [];
-        foreach($session->getTeams() as $team){
-            if($team->isPlayer($player)) $team->removePlayer($player);
-            if($team->isAlive()) $aliveTeams[] = $team;
-        }
-        $player->setGamemode(3);
-
-        if(count($aliveTeams) <= 1){
-            $winner = $aliveTeams[0] ?? null;
-            if(!$winner instanceof Team){
-                foreach($session->getOnlinePlayers() as $sessionPlayer){
-                    $sessionPlayer->setGamemode(3);
-                    $sessionPlayer->getArmorInventory()->clearAll();
-                    $sessionPlayer->getInventory()->clearAll();
-                }
-                $gameSession->startCountdown(3, Countdown::END);
-                return;
-            }
-
-            foreach($session->getOnlinePlayers() as $sessionPlayer){
-                $sessionPlayer->setGamemode(3);
-                $sessionPlayer->getArmorInventory()->clearAll();
-                $sessionPlayer->getInventory()->clearAll();
-                $sessionPlayer->sendTitle($winner->getColor().$winner->getName(), TextFormat::GREEN." WON THE FIGHT!");
-            }
-            $gameSession->startCountdown(8, Countdown::END);
-        }
-    }
-
-    public function onPlayerRespawn(PlayerRespawnEvent $event): void {
-        $player = $event->getPlayer();
-        $session = SessionManager::getInstance()->getSessionOfPlayer($player);
-        $gameSession = $session?->getGameSession();
-        if(!$gameSession instanceof KitPvPGameSession || !$gameSession->isRunning()) return;
-        $player->setGamemode(3);
+        $session->getTeamByPlayer($player)?->removePlayer($player);
+        $gameSession->checkGameEnd(!$gameSession->isRunning());
     }
 }

@@ -55,6 +55,12 @@ class Queue {
     }
 
     public function handlePlayer(Player $player): void {
+        foreach(QueueManager::getInstance()->getQueues() as $queue) {
+            if($queue->getMinigame() !== $this->getMinigame() && $queue->isPlayer($player)) {
+                $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("message-already-in-queue", $player));
+                return;
+            }
+        }
         if($this->isPlayer($player)) {
             $this->removePlayer($player);
             $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("message-queue-left", $player));
