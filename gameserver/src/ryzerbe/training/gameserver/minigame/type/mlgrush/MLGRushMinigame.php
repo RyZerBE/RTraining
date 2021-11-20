@@ -293,7 +293,14 @@ class MLGRushMinigame extends Minigame {
         }
 
         if(!$event->isCancelled()) {
-            if($gameSession->isInfiniteBlocks()) $event->setDrops([]);
+            if($gameSession->isInfiniteBlocks()){
+                $event->setDrops([]);
+            } else {
+                $drops = [];
+                foreach($event->getDrops() as $drop) {
+                    $drop->setCustomName("§r§a" . $drop->getVanillaName());
+                }
+            }
         }
     }
 

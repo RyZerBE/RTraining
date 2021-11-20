@@ -57,28 +57,34 @@ class GameZoneManager {
         $inventory->setContents([
             0 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_SWORD), [
                 Enchantment::UNBREAKING => 5,
+                Enchantment::SHARPNESS => 1,
             ])->setCustomName("§r§6Diamond Sword"),
-            1 => Item::get(ItemIds::BOW)->setCustomName("§r§6Bow"),
+            1 => ItemUtils::addEnchantments(Item::get(ItemIds::GOLDEN_PICKAXE)->setCustomName("§r§6Pickaxe"), [
+                Enchantment::EFFICIENCY => 1,
+                Enchantment::UNBREAKING => 5,
+            ]),
             2 => Item::get(BlockIds::SANDSTONE, 0, 64)->setCustomName("§r§6Sandstone"),
             3 => Item::get(ItemIds::GOLDEN_APPLE, 0, 12)->setCustomName("§r§6Golden Apple"),
-            8 => Item::get(ItemIds::ARROW, 0, 16)->setCustomName("§r§6Arrow"),
+            6 => Item::get(ItemIds::ARROW, 0, 16)->setCustomName("§r§6Arrow"),
+            7 => Item::get(BlockIds::COBWEB, 0, 2)->setCustomName("§r§6Cobweb"),
+            8 => Item::get(ItemIds::BOW)->setCustomName("§r§6Bow"),
         ]);
         $armorInventory->setContents([
             0 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_HELMET), [
                 Enchantment::UNBREAKING => 3,
-                Enchantment::PROTECTION => 2,
+                Enchantment::PROTECTION => 1,
             ])->setCustomName("§r§6Diamond Helmet"),
             1 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_CHESTPLATE), [
                 Enchantment::UNBREAKING => 3,
-                Enchantment::PROTECTION => 2,
+                Enchantment::PROTECTION => 1,
             ])->setCustomName("§r§6Diamond Chestplate"),
             2 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_LEGGINGS), [
                 Enchantment::UNBREAKING => 3,
-                Enchantment::PROTECTION => 2,
+                Enchantment::PROTECTION => 1,
             ])->setCustomName("§r§6Diamond Leggings"),
             3 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_BOOTS), [
                 Enchantment::UNBREAKING => 3,
-                Enchantment::PROTECTION => 2,
+                Enchantment::PROTECTION => 1,
             ])->setCustomName("§r§6Diamond Boots"),
         ]);
 
@@ -107,26 +113,47 @@ class GameZoneManager {
         $inventory->setHeldItemIndex(4);
     }
 
+    private array $scheduledBlocks = [];
+    /** @var Block[]  */
     private array $blocks = [];
 
     public function scheduleBlock(Block $block, int $delay = 100): void {
         $block->getLevel()->broadcastLevelEvent($block, LevelEventPacket::EVENT_BLOCK_START_BREAK, (int) (65535 / $delay));
-        $this->blocks[(Server::getInstance()->getTick() + $delay)][] = [
-            Level::blockHash($block->getFloorX(), $block->getFloorY(), $block->getFloorZ()),
-            $block->getId(),
-            $block->getDamage(),
-        ];
+        $hash = Level::blockHash($block->getFloorX(), $block->getFloorY(), $block->getFloorZ());
+        $this->blocks[$hash] = $block;
+        $this->scheduledBlocks[(Server::getInstance()->getTick() + $delay)][] = $hash;
+    }
+
+    public function removeBlock(Block $block, bool $ignoreScheduledBlocks = false): void {
+        $hash = Level::blockHash($block->getFloorX(), $block->getFloorY(), $block->getFloorZ());
+        unset($this->blocks[$hash]);
+        if(!$ignoreScheduledBlocks) {
+            foreach($this->scheduledBlocks as $tick => $scheduledBlocks) {
+                foreach($scheduledBlocks as $key => $scheduledBlockHash) {
+                    if($scheduledBlocks !== $hash) continue;
+                    unset($this->scheduledBlocks[$tick][$key]);
+                    break;
+                }
+            }
+        }
+    }
+
+    public function isBlock(Block $block): bool {
+        return isset($this->blocks[Level::blockHash($block->getFloorX(), $block->getFloorY(), $block->getFloorZ())]);
     }
 
     public function onUpdate(): void {
         $tick = Server::getInstance()->getTick();
         $level = Server::getInstance()->getDefaultLevel();
-        foreach(($this->blocks[$tick] ?? []) as $data) {
-            Level::getBlockXYZ($data[0], $x, $y, $z);
+        foreach(($this->scheduledBlocks[$tick] ?? []) as $hash) {
+            $block = $this->blocks[$hash] ?? null;
+            if($block === null) continue;
+            Level::getBlockXYZ($hash, $x, $y, $z);
             $level->addParticle(new DestroyBlockParticle(new Vector3($x, $y, $z), $level->getBlockAt($x, $y, $z)));
-            $level->setBlockIdAt($x, $y, $z, $data[1]);
-            $level->setBlockDataAt($x, $y, $z, $data[2]);
+            $level->setBlockIdAt($x, $y, $z, $block->getId());
+            $level->setBlockDataAt($x, $y, $z, $block->getDamage());
+            $this->removeBlock($block, true);
         }
-        unset($this->blocks[$tick]);
+        unset($this->scheduledBlocks[$tick]);
     }
 }

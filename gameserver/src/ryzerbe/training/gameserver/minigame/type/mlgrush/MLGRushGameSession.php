@@ -58,7 +58,7 @@ class MLGRushGameSession extends GameSession {
                 Enchantment::EFFICIENCY => 1,
                 Enchantment::UNBREAKING => 5
             ]),
-            "block" =>  Item::get(BlockIds::SANDSTONE, 0, 64)->setCustomName("§r§aSandstone")
+            "block" => Item::get(BlockIds::SANDSTONE, 0, 64)->setCustomName("§r§a" .  Item::get(BlockIds::SANDSTONE)->getVanillaName())
         ]);
     }
 

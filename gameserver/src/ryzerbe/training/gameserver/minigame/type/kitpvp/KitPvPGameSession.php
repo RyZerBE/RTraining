@@ -14,6 +14,7 @@ use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\Kit;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\KitManager;
 use ryzerbe\training\gameserver\util\Countdown;
 use ryzerbe\training\gameserver\util\ScoreboardUtils;
+use function array_rand;
 use function count;
 use function floor;
 use function pow;
@@ -30,13 +31,12 @@ class KitPvPGameSession extends GameSession {
     public function loadPlayerKits(): void{
         $session = $this->getSession();
         if($this->getKit() === null) {
-            foreach($session->getOnlinePlayers() as $player) {
-                KitManager::getInstance()->loadPlayerKit($player);
-            }
-        }else {
-            foreach($session->getOnlinePlayers() as $player) {
-                KitManager::getInstance()->loadKitForPlayer($player, $this->getKit()->getName());
-            }
+            $kits = KitManager::getInstance()->getKits();
+            $kit = $kits[array_rand($kits)];
+            $this->setKit($kit);
+        }
+        foreach($session->getOnlinePlayers() as $player) {
+            KitManager::getInstance()->loadKitForPlayer($player, $this->getKit()->getName());
         }
     }
 
