@@ -110,21 +110,21 @@ class Challenge {
         }else if($this->getTeam() !== null && $trainingPlayer->getTeam() !== null) {
             $playerNames = [];
 
-            foreach($opponentPlayer->getTeam()->getPlayers(true) as $playerNameee) {
-                $playerNames[] = $playerNameee;
+            foreach($opponentPlayer->getTeam()->getPlayers(true) as $__playerName) {
+                $playerNames[] = $__playerName;
             }
-            foreach($this->getTeam()->getPlayers(true) as $playerNameee) {
-                $playerNames[] = $playerNameee;
+            foreach($this->getTeam()->getPlayers(true) as $__playerName) {
+                $playerNames[] = $__playerName;
             }
             $pk->addData("players", json_encode($playerNames));
             $pk->addData("teams", json_encode([
                 "team_1" => [
                     "players" => $this->getTeam()->getPlayers(true),
-                    "data" => ["name" => "Team 1", "color" => "§b"]
+                    "data" => ["name" => $this->getTeam()->getName(), "color" => "§b"]
                 ],
                 "team_2" => [
                     "players" => $opponentPlayer->getTeam()->getPlayers(true),
-                    "data" => ["name" => "Team 2", "color" => "§c"]
+                    "data" => ["name" => $opponentPlayer->getTeam()->getName(), "color" => "§c"]
                 ]
             ])); //todo: team name configurable
         }else {

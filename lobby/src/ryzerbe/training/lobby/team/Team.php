@@ -20,9 +20,20 @@ class Team {
     /** @var Player[]  */
     private array $players = [];
 
+    private string $name;
+
     public function __construct(TrainingPlayer $creator){
         $this->id = uniqid();
+        $this->name = "Team ".$creator->getPlayer()->getName();
         $this->creator = $creator;
+    }
+
+    public function getName(): string{
+        return $this->name;
+    }
+
+    public function setName(string $name): void{
+        $this->name = $name;
     }
 
     /**

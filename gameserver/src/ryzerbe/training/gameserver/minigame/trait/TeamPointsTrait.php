@@ -10,11 +10,11 @@ trait TeamPointsTrait {
     private array $points = [];
 
     public function getPoints(Team $team): int{
-        return $this->points[$team->getName()] ?? 0;
+        return $this->points[$team->getId()] ?? 0;
     }
 
     public function setPoints(Team $team, int $points): void{
-        $this->points[$team->getName()] = $points;
+        $this->points[$team->getId()] = $points;
     }
 
     public function addPoints(Team $team, int $points): void{

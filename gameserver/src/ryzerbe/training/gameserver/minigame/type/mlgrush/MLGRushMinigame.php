@@ -46,8 +46,8 @@ class MLGRushMinigame extends Minigame {
     public function loadMaps(): void{
         $this->mapPool = [
             new MLGRushMap("Line", "Neruxvace", [
-                "Team 1" => new Location(128.5, 100, 128.5, 180.0, 0.0),
-                "Team 2" => new Location(128.5, 100, 98.5, 0.0, 0.0),
+                new Location(128.5, 100, 128.5, 180.0, 0.0),
+                new Location(128.5, 100, 98.5, 0.0, 0.0),
             ], new Location(128.5, 70, 10.5, 0.0, 0.0), $this, 92, 112)
         ];
     }
@@ -127,7 +127,7 @@ class MLGRushMinigame extends Minigame {
                         $gameMap = $this->getMap()->getGameMap();
                         $level = $this->getMap()->getLevel();
                         foreach($session->getTeams() as $team) {
-                            $location = $gameMap->getTeamLocation($team->getName(), $level);
+                            $location = $gameMap->getTeamLocation($team->getId(), $level);
                             if($location === null) continue;
                             foreach($team->getPlayers() as $player) {
                                 $player->playSound("random.explode", 5.0, 1.0, [$player]);
@@ -190,7 +190,7 @@ class MLGRushMinigame extends Minigame {
             $level = $this->getMap()->getLevel();
             $session->getGameSession()->setLevel($level);
             foreach($session->getTeams() as $team) {
-                $location = $gameMap->getTeamLocation($team->getName(), $level);
+                $location = $gameMap->getTeamLocation($team->getId(), $level);
                 if($location === null){
                     Logger::error("Team " . $team->getName() . " is not valid!");
                     continue;
@@ -201,7 +201,7 @@ class MLGRushMinigame extends Minigame {
                     $player->setGamemode(0);
                     $player->setHealth($player->getMaxHealth());
                     $player->setFood($player->getMaxFood());
-                    $player->teleport($gameMap->getTeamLocation($team->getName(), $level));
+                    $player->teleport($gameMap->getTeamLocation($team->getId(), $level));
                     $player->setImmobile(true);
                     $player->setNameTag($color.$player->getName());
                     $player->setDisplayName($color.$player->getName());
@@ -229,7 +229,14 @@ class MLGRushMinigame extends Minigame {
         $player = $event->getPlayer();
         $session = SessionManager::getInstance()->getSessionOfPlayer($player);
         $gameSession = $session?->getGameSession();
-        if(!$gameSession instanceof MLGRushGameSession || !$gameSession->isRunning()) return;
+        if(!$gameSession instanceof MLGRushGameSession) return;
+        if(!$gameSession->isRunning()) {
+            if(!$player->isCreative() && $event->getFrom()->distanceSquared($event->getTo()) > 0.09) {
+                $player->setImmobile();
+            }
+            return;
+        }
+
         /** @var MLGRushMap $gameMap */
         $gameMap = $this->map->getGameMap();
         if($player->getY() < $gameMap->getDeathHeight()) {
@@ -293,12 +300,19 @@ class MLGRushMinigame extends Minigame {
         }
 
         if(!$event->isCancelled()) {
-            if($gameSession->isInfiniteBlocks()){
-                $event->setDrops([]);
-            } else {
-                $drops = [];
-                foreach($event->getDrops() as $drop) {
-                    $drop->setCustomName("§r§a" . $drop->getVanillaName());
+            $drops = $event->getDrops();
+            $event->setDrops([]);
+            if(!$gameSession->isInfiniteBlocks()){
+                $inventory = $player->getInventory();
+                foreach($drops as $item) {
+                    foreach($inventory->getContents() as $slot => $content) {
+                        if($item->equals($content, true, false) && $content->getCount() < $content->getMaxStackSize()) {
+                            $content->count++;
+                            $inventory->setItem($slot, $content);
+                            return;
+                        }
+                    }
+                    $inventory->addItem($item->setCustomName("§r§a".$item->getVanillaName()));
                 }
             }
         }

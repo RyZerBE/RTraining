@@ -6,7 +6,7 @@ use pocketmine\item\Item;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\customitem\CustomItem;
 use ryzerbe\training\lobby\form\type\TeamInviteProgressForm;
-use ryzerbe\training\lobby\form\type\TeamSettingForm;
+use ryzerbe\training\lobby\form\type\TeamOverviewForm;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 
 class TeamItem extends CustomItem {
@@ -17,7 +17,7 @@ class TeamItem extends CustomItem {
         if($trainingPlayer === null) return;
 
         if($trainingPlayer->getTeam() !== null) {
-            TeamSettingForm::open($player);
+            TeamOverviewForm::open($player);
         }else {
             TeamInviteProgressForm::open($player);
         }

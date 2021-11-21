@@ -137,9 +137,9 @@ class MLGRushGameSession extends GameSession {
         $player->setHealth($player->getMaxHealth());
         $player->resetMotion();
         $player->resetFallDistance();
-        $this->loadInventory($player, $minigame->getName(), null);
+        $this->loadInventory($player, $minigame->getName(), null, null);
 
-        $location = $map->getGameMap()->getTeamLocation($session->getTeamByPlayer($player)?->getName(), $level)->asLocation();
+        $location = $map->getGameMap()->getTeamLocation($session->getTeamByPlayer($player)?->getId(), $level)->asLocation();
         while(($level->getBlock($location)->isSolid() || $level->getBlock($location->add(0, 1))->isSolid()) && $location->y < Level::Y_MAX) $location->y++;
         $player->teleport($location);
     }
@@ -188,7 +188,7 @@ class MLGRushGameSession extends GameSession {
             if($this->getSettings()->elo) {
                 $looserElo = 0;
                 foreach($session->getTeams() as $team) {
-                    if($team->getName() !== $winner->getName()){
+                    if($team->getId() !== $winner->getId()){
                         $looserElo += $team->getElo();
                     }
                 }
@@ -202,7 +202,7 @@ class MLGRushGameSession extends GameSession {
 
                 foreach($session->getPlayers() as $player) {
                     $team = $session->getTeamByPlayer($player);
-                    if($team->getName() !== $winner->getName()){
+                    if($team->getId() !== $winner->getId()){
                         StatsAsyncProvider::deductStatistic($player, $minigame->getName(), "elo", $elo);
                         Server::getInstance()->getPlayerExact($player)?->sendMessage(TextFormat::DARK_GRAY."[".TextFormat::BLUE."ELO".TextFormat::DARK_GRAY."] ".TextFormat::RED."- $elo Elo");
                     } else {

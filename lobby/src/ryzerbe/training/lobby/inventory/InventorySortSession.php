@@ -10,12 +10,14 @@ use pocketmine\Player;
 class InventorySortSession {
     private Player $player;
     private string $minigame;
+    private ?string $key;
 
     private ?Closure $closure = null;
 
-    public function __construct(Player $player, string $minigame){
+    public function __construct(Player $player, string $minigame, ?string $key){
         $this->player = $player;
         $this->minigame = $minigame;
+        $this->key = $key;
     }
 
     public function getPlayer(): Player{
@@ -24,6 +26,10 @@ class InventorySortSession {
 
     public function getMinigame(): string{
         return $this->minigame;
+    }
+
+    public function getKey(): ?string{
+        return $this->key;
     }
 
     public function setClosure(?Closure $closure): void{

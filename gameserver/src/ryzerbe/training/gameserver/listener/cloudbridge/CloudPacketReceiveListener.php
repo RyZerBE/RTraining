@@ -8,7 +8,6 @@ use pocketmine\event\Listener;
 use ryzerbe\training\gameserver\game\match\MatchQueue;
 use ryzerbe\training\gameserver\game\match\MatchRequest;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
-use ryzerbe\training\gameserver\minigame\type\kitpvp\KitPvPMinigame;
 use ryzerbe\training\gameserver\util\Logger;
 use function boolval;
 use function count;
@@ -24,7 +23,7 @@ class CloudPacketReceiveListener implements Listener{
             $minigameName = $packet->getValue("minigame") ?? "Unknown";
             $minigame = MinigameManager::getMinigame($minigameName);
             if($minigame === null) {
-                Logger::error("Received MatchPacket with unknown minigame");
+                Logger::error("Received MatchPacket with unknown minigame '".$minigameName."'");
                 return;
             }
 

@@ -12,6 +12,7 @@ use function count;
 class Team {
     private Session $session;
 
+    private int $id;
     private string $name;
     private string $color;
 
@@ -20,14 +21,19 @@ class Team {
 
     private int $elo = 1000;
 
-    public function __construct(Session $session, string $name, string $color) {
+    public function __construct(Session $session, int $id, string $name, string $color) {
         $this->session = $session;
+        $this->id = $id;
         $this->name = $name;
         $this->color = $color;
     }
 
     public function getSession(): Session{
         return $this->session;
+    }
+
+    public function getId(): int{
+        return $this->id;
     }
 
     public function getColor(): string {

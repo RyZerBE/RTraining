@@ -2,8 +2,6 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp\kits;
 
-use pocketmine\Player;
-
 class Kit {
     private string $name;
     private array $items, $armor;
@@ -24,10 +22,5 @@ class Kit {
 
     public function getItems(): array{
         return $this->items;
-    }
-
-    public function givePlayer(Player $player){
-        $player->getArmorInventory()->setContents($this->getArmor());
-        $player->getInventory()->setContents($this->getItems());
     }
 }

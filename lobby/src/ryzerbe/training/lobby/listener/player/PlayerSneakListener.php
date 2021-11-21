@@ -7,7 +7,6 @@ use pocketmine\event\player\PlayerToggleSneakEvent;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\training\lobby\inventory\InventorySortManager;
 use ryzerbe\training\lobby\item\TrainingItemManager;
-use ryzerbe\training\lobby\kit\KitManager;
 
 class PlayerSneakListener implements Listener {
     public function onPlayerSneak(PlayerToggleSneakEvent $event): void{
@@ -26,22 +25,6 @@ class PlayerSneakListener implements Listener {
             $player->getInventory()->setHeldItemIndex(4);
             $player->setImmobile(false);
             $player->removeAllEffects();
-            return;
         }
-
-        $kitName = KitManager::getInstance()->sort[$player->getName()] ?? null;
-        if($kitName === null) return;
-
-        KitManager::getInstance()->savePlayerKitSort($player, $kitName, $player->getInventory()->getContents());
-        $player->playSound("random.levelup", 5.0, 1.0, [$player]);
-        unset(KitManager::getInstance()->sort[$player->getName()]);
-        $player->getInventory()->clearAll();
-
-        foreach(TrainingItemManager::getInstance()->getItems() as $trainingItem) {
-            $trainingItem->giveToPlayer($player);
-        }
-        $player->getInventory()->setHeldItemIndex(4);
-        $player->setImmobile(false);
-        $player->removeAllEffects();
     }
 }

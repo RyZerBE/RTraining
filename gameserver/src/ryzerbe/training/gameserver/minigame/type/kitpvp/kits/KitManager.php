@@ -3,15 +3,12 @@
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp\kits;
 
 use mysqli;
-use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\SingletonTrait;
 use ryzerbe\core\util\async\AsyncExecutor;
-use ryzerbe\training\gameserver\session\SessionManager;
 use function base64_decode;
 use function base64_encode;
-use function explode;
 use function serialize;
 use function unserialize;
 use function zlib_decode;
@@ -90,75 +87,6 @@ class KitManager {
                 $kit = new Kit($data["name"], unserialize(zlib_decode(base64_decode($data["items"]))), unserialize(zlib_decode(base64_decode($data["armor"]))));
                 KitManager::getInstance()->registerKit($kit);
             }
-        });
-    }
-
-    public function loadPlayerKit(Player|string $player){
-        if($player instanceof Player) $player = $player->getName();
-        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($player){
-            $res = $mysqli->query("SELECT * FROM `kitpvp_kits_player` WHERE playername='$player'");
-            if($res->num_rows <= 0) {
-                $mysqli->query("INSERT INTO `kitpvp_kits_player`(`playername`, `kit_name`) VALUES ('$player', 'Starter')");
-                return "Starter";
-            }
-
-            $kitName = $res->fetch_assoc()["kit_name"];
-            $res = $mysqli->query("SELECT * FROM `kitpvp_kits_sort` WHERE kit_name='$kitName' AND playername='$player'");
-            if($res->num_rows <= 0) return $kitName;
-
-            return $kitName."#".zlib_decode(base64_decode($res->fetch_assoc()["sort"]));
-        }, function(Server $server, string $result) use ($player): void{
-            $player = $server->getPlayerExact($player);
-            if($player === null) return;
-
-            $resI = explode("#", $result);
-            $kitName = $resI[0];
-            $kit = KitManager::getInstance()->getKitByName($kitName);
-            if($kit === null) {
-                $kit = KitManager::getInstance()->getKitByName("OnlySword");
-            }
-
-            $player->getArmorInventory()->setContents($kit->getArmor());
-            if(isset($resI[1])) {
-                $player->getInventory()->setContents(unserialize($resI[1]));
-            }else {
-                $player->getInventory()->setContents($kit->getItems());
-            }
-
-            KitManager::getInstance()->playerKit[$player->getName()] = $kitName;
-            $session = SessionManager::getInstance()->getSessionOfPlayer($player);
-            $session?->getGameSession()?->sendScoreboard();
-        });
-    }
-
-    public function loadKitForPlayer(Player|string $player, string $kitName){
-        if($player instanceof Player) $player = $player->getName();
-        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($player, $kitName){
-            $res = $mysqli->query("SELECT * FROM `kitpvp_kits_sort` WHERE kit_name='$kitName' AND playername='$player'");
-            if($res->num_rows <= 0) return $kitName;
-
-            return $kitName."#".zlib_decode(base64_decode($res->fetch_assoc()["sort"]));
-        }, function(Server $server, string $result) use ($player): void{
-            $player = $server->getPlayerExact($player);
-            if($player === null) return;
-
-            $resI = explode("#", $result);
-            $kitName = $resI[0];
-            $kit = KitManager::getInstance()->getKitByName($kitName);
-            if($kit === null) {
-                $kit = KitManager::getInstance()->getKitByName("OnlySword");
-            }
-
-            $player->getArmorInventory()->setContents($kit->getArmor());
-            if(isset($resI[1])) {
-                $player->getInventory()->setContents(unserialize($resI[1]));
-            }else {
-                $player->getInventory()->setContents($kit->getItems());
-            }
-
-            KitManager::getInstance()->playerKit[$player->getName()] = $kitName;
-            $session = SessionManager::getInstance()->getSessionOfPlayer($player);
-            $session?->getGameSession()?->sendScoreboard();
         });
     }
 }

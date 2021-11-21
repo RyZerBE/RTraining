@@ -7,10 +7,11 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\training\lobby\minigame\MinigameManager;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\Training;
 
-class SelectGameForm {
+class SelectMinigameForm {
     public static function open(Player $player, array $extraData = []): void{
         $trainingPlayer = TrainingPlayerManager::getPlayer($player);
         if($trainingPlayer === null) return;
@@ -51,9 +52,11 @@ class SelectGameForm {
             $willChallenge->challenge($challenger, $data);
         });
 
-        $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Select Game");
-        $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::BLUE.TextFormat::BOLD." KitPvP", -1, "", "KitPvP");
-        $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::BLUE.TextFormat::BOLD." MLGRush", -1, "", "MLGRush");
+        $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Select Minigame");
+        foreach(MinigameManager::getInstance()->getMinigames() as $minigame) {
+            if(!$minigame->isMultiplayer()) continue;
+            $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::BLUE.TextFormat::BOLD." ".$minigame->getName(), -1, "", $minigame->getName());
+        }
         $form->sendToPlayer($player);
     }
 }

@@ -1,9 +1,11 @@
 name: Training-Lobby
-version: 1.0.0
+version: 1.1.0
 api: 3.0.0
 main: ryzerbe\training\lobby\Training
 load: POSTWORLD
 
 permissions:
   training.admin:
+    default: op
+  training.cmd.beta:
     default: op

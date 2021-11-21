@@ -2,7 +2,7 @@
 
 namespace ryzerbe\training\lobby\kit;
 
-use pocketmine\Player;
+use pocketmine\item\Item;
 
 class Kit {
     /** @var string  */
@@ -30,26 +30,16 @@ class Kit {
     }
 
     /**
-     * @return array
+     * @return Item[]
      */
     public function getArmor(): array{
         return $this->armor;
     }
 
     /**
-     * @return array
+     * @return Item[]
      */
     public function getItems(): array{
         return $this->items;
-    }
-
-    /**
-     * @param Player $player
-     */
-    public function givePlayer(Player $player){
-        $player->getInventory()->clearAll();
-        $player->getArmorInventory()->clearAll();
-        $player->getArmorInventory()->setContents($this->getArmor());
-        $player->getInventory()->setContents($this->getItems());
     }
 }

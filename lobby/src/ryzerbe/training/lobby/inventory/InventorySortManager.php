@@ -33,17 +33,32 @@ class InventorySortManager {
     /**
      * @param Item[] $items
      */
-    public function registerItems(string $minigame, array $items): void {
+    public function registerItems(string $minigame, ?string $key, array $items): void {
         foreach($items as $identifier => $item) {
-            $this->items[$minigame][$identifier] = ItemUtils::addItemTag($item, $identifier, "minigame");
+            if($key !== null) {
+                $this->items[$minigame][$key][$identifier] = ItemUtils::addItemTag($item, $identifier, "minigame");
+            } else {
+                $this->items[$minigame][$identifier] = ItemUtils::addItemTag($item, $identifier, "minigame");
+            }
         }
+
+        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($minigame): void {
+            $table = strtolower($minigame) . "_inventory_sort";
+            $mysqli->query("CREATE TABLE IF NOT EXISTS $table(`id` INT NOT NULL KEY AUTO_INCREMENT, `playername` VARCHAR(32) NOT NULL, `inventory` TEXT NOT NULL, `identifier` VARCHAR(64) NULL DEFAULT NULL)");
+        });
     }
 
-    public function getItems(string $minigame): array{
+    public function getItems(string $minigame, ?string $key = null): array{
+        if($key !== null) {
+            return array_values($this->items[$minigame][$key] ?? []);
+        }
         return array_values($this->items[$minigame] ?? []);
     }
 
-    public function getItem(string $minigame, string $identifier): ?Item {
+    public function getItem(string $minigame, string $identifier, ?string $key = null): ?Item {
+        if($key !== null) {
+            return $this->items[$minigame][$key][$identifier] ?? null;
+        }
         return $this->items[$minigame][$identifier] ?? null;
     }
 
@@ -66,22 +81,26 @@ class InventorySortManager {
         return $this->sessions;
     }
 
-    public function loadSession(Player $player, string $minigame, ?Closure $closure): void {
+    public function loadSession(Player $player, string $minigame, ?string $key, ?Closure $closure): void {
         $playername = $player->getName();
-        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($minigame, $playername): ?string {
+        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($minigame, $playername, $key): ?string {
             $table = strtolower($minigame) . "_inventory_sort";
-            $query = $mysqli->query("SELECT inventory FROM $table WHERE playername='$playername'");
+            if($key === null) {
+                $query = $mysqli->query("SELECT inventory FROM $table WHERE playername='$playername'");
+            } else {
+                $query = $mysqli->query("SELECT inventory FROM $table WHERE playername='$playername' AND identifier='$key'");
+            }
             if($query->num_rows <= 0) return null;
             return $query->fetch_assoc()["inventory"];
-        }, function(Server $server, ?string $result) use ($player, $minigame, $closure): void {
+        }, function(Server $server, ?string $result) use ($player, $minigame, $closure, $key): void {
             if(!$player->isConnected()) return;
-            $defaultItems = $this->getItems($minigame);
+            $defaultItems = $this->getItems($minigame, $key);
             $items = [];
             if($result === null || empty($decode = @json_decode($result, true))) {
                 $items = $defaultItems;
             } else {
                 foreach($decode as $slot => $item) {
-                    $item = $this->getItem($minigame, $item);
+                    $item = $this->getItem($minigame, $item, $key);
                     if($item === null) continue;
                     $items[$slot] = $item;
                 }
@@ -93,7 +112,7 @@ class InventorySortManager {
             $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("sneak-to-save", $player->getName()));
             $player->addEffect(new EffectInstance(Effect::getEffect(Effect::BLINDNESS), 9999, 2, false));
             $player->setImmobile();
-            $this->addSession(new InventorySortSession($player, $minigame));
+            $this->addSession(new InventorySortSession($player, $minigame, $key));
             if($closure !== null) ($closure)();
         });
     }
@@ -102,14 +121,28 @@ class InventorySortManager {
         $player = $session->getPlayer();
         $items = [];
         foreach($player->getInventory()->getContents() as $slot => $item) {
+            if(!ItemUtils::hasItemTag($item, "minigame")) return;
             $items[$slot] = ItemUtils::getItemTag($item, "minigame");
         }
         $inventory = json_encode($items);
         $playername = $player->getName();
         $minigame = $session->getMinigame();
-        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($inventory, $playername, $minigame): void {
+        $key = $session->getKey();
+        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($inventory, $playername, $minigame, $key): void {
             $table = strtolower($minigame) . "_inventory_sort";
-            $mysqli->query("INSERT INTO $table (playername, inventory) VALUES ('$playername', '$inventory') ON DUPLICATE KEY UPDATE inventory='$inventory'");
+            if($key !== null) {
+                if($mysqli->query("SELECT id FROM $table WHERE playername='$playername' AND identifier='$key'")->num_rows <= 0) {
+                    $mysqli->query("INSERT INTO $table (playername, inventory, identifier) VALUES ('$playername', '$inventory', '$key')");
+                    return;
+                }
+                $mysqli->query("UPDATE $table SET inventory='$inventory' WHERE playername='$playername' AND identifier='$key'");
+            } else {
+                if($mysqli->query("SELECT id FROM $table WHERE playername='$playername'")->num_rows <= 0) {
+                    $mysqli->query("INSERT INTO $table (playername, inventory) VALUES ('$playername', '$inventory')");
+                    return;
+                }
+                $mysqli->query("UPDATE $table SET inventory='$inventory' WHERE playername='$playername'");
+            }
         });
     }
 }

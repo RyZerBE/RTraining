@@ -77,11 +77,12 @@ class MatchRequest {
 
         $session = new Session($playerNames, $minigame->getName(), $this->getExtraData());
 
+        $id = -1;
         foreach($this->getTeams() as $__team) {
             $players = $__team["players"];
             $data = $__team["data"];
 
-            $team = new Team($session, $data["name"], $data["color"]);
+            $team = new Team($session, ++$id, $data["name"], $data["color"]);
             foreach($players as $player) {
                 $team->addPlayer(Server::getInstance()->getPlayerExact($player));
             }
@@ -108,13 +109,5 @@ class MatchRequest {
 
     public function addExtraData(string $key, $value){
         $this->extraData[$key] = $value;
-    }
-
-    public function removeExtraData(string $key){
-        unset($this->extraData[$key]);
-    }
-
-    public function withElo(): bool{
-        return $this->elo;
     }
 }

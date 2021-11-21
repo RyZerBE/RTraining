@@ -8,6 +8,7 @@ use ryzerbe\statssystem\provider\StatsAsyncProvider;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\team\Team;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
+use ryzerbe\training\gameserver\minigame\trait\InventorySortTrait;
 use ryzerbe\training\gameserver\minigame\trait\MinigameStatesTrait;
 use ryzerbe\training\gameserver\minigame\trait\TeamEloTrait;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\Kit;
@@ -23,6 +24,7 @@ class KitPvPGameSession extends GameSession {
     use BlockStorageTrait;
     use MinigameStatesTrait;
     use TeamEloTrait;
+    use InventorySortTrait;
 
     private ?Countdown $countdown;
     public int $tick = 0;
@@ -30,13 +32,16 @@ class KitPvPGameSession extends GameSession {
 
     public function loadPlayerKits(): void{
         $session = $this->getSession();
-        if($this->getKit() === null) {
+        $kit = $this->getKit();
+        if($kit === null) {
             $kits = KitManager::getInstance()->getKits();
             $kit = $kits[array_rand($kits)];
             $this->setKit($kit);
         }
         foreach($session->getOnlinePlayers() as $player) {
-            KitManager::getInstance()->loadKitForPlayer($player, $this->getKit()->getName());
+            $this->loadInventory($player, $this->getSession()->getMinigame()->getName(), $kit->getName(), function() use ($player, $kit): void {
+                $player->getArmorInventory()->setContents($kit->getArmor());
+            });
         }
     }
 
@@ -91,7 +96,7 @@ class KitPvPGameSession extends GameSession {
             if($this->getSettings()->elo) {
                 $looserElo = 0;
                 foreach($session->getTeams() as $team) {
-                    if($team->getName() !== $winner->getName()){
+                    if($team->getId() !== $winner->getId()){
                         $looserElo += $team->getElo();
                     }
                 }
@@ -105,7 +110,7 @@ class KitPvPGameSession extends GameSession {
 
                 foreach($session->getPlayers() as $player) {
                     $team = $session->getTeamByPlayer($player);
-                    if($team === null || $team->getName() !== $winner->getName()){
+                    if($team === null || $team->getId() !== $winner->getId()){
                         StatsAsyncProvider::deductStatistic($player, $minigame->getName(), "elo", $elo);
                         Server::getInstance()->getPlayerExact($player)?->sendMessage(TextFormat::DARK_GRAY."[".TextFormat::BLUE."ELO".TextFormat::DARK_GRAY."] ".TextFormat::RED."- $elo Elo");
                     } else {

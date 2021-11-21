@@ -37,16 +37,20 @@ trait InventorySortTrait {
         return $this->items[$minigame][$identifier] ?? null;
     }
 
-    public function loadInventory(Player $player, string $minigame, ?Closure $closure): void {
+    public function loadInventory(Player $player, string $minigame, ?string $key, ?Closure $closure): void {
         if(isset($this->inventories[$player->getName()])) {
             $player->getInventory()->setContents($this->inventories[$player->getName()]);
             if($closure !== null) ($closure)();
             return;
         }
         $playername = $player->getName();
-        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($minigame, $playername): ?string {
+        AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($minigame, $playername, $key): ?string {
             $table = strtolower($minigame) . "_inventory_sort";
-            $query = $mysqli->query("SELECT inventory FROM $table WHERE playername='$playername'");
+            if($key === null) {
+                $query = $mysqli->query("SELECT inventory FROM $table WHERE playername='$playername'");
+            } else {
+                $query = $mysqli->query("SELECT inventory FROM $table WHERE playername='$playername' AND identifier='$key'");
+            }
             if($query->num_rows <= 0) return null;
             return $query->fetch_assoc()["inventory"];
         }, function(Server $server, ?string $result) use ($player, $minigame, $closure): void {

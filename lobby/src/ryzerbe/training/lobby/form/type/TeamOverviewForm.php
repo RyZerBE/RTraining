@@ -9,7 +9,7 @@ use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use function implode;
 
-class TeamSettingForm {
+class TeamOverviewForm {
     public static function open(Player $player, array $extraData = []): void{
         $trainingPlayer = TrainingPlayerManager::getPlayer($player);
         if($trainingPlayer === null) return;
@@ -18,7 +18,7 @@ class TeamSettingForm {
 
             switch($data) {
                 case "settings":
-                    //TODO: Team settings?
+                    TeamSettingsForm::open($player);
                     break;
                 case "leave":
                     $trainingPlayer->getTeam()?->leave($trainingPlayer);

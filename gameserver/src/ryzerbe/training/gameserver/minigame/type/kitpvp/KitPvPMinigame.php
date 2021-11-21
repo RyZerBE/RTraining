@@ -31,8 +31,8 @@ class KitPvPMinigame extends Minigame {
     public function loadMaps(): void{
         $this->mapPool = [
             new GameMap("Emerald", "Unknown", [
-                "Team 1" => new Location(-1.5, 65, 39.5, 180.0, 0.0),
-                "Team 2" => new Location(0.5, 65, -36.5, 0.0, 0.0)
+                new Location(-1.5, 65, 39.5, 180.0, 0.0),
+                new Location(0.5, 65, -36.5, 0.0, 0.0),
             ], new Location(0.5, 70, 1.5, 0.0, 0.0), $this)
         ];
     }
@@ -62,14 +62,14 @@ class KitPvPMinigame extends Minigame {
                     $gameMap = $this->getMap()->getGameMap();
                     $level = $this->getMap()->getLevel();
                     foreach($session->getTeams() as $team) {
-                        $location = $gameMap->getTeamLocation($team->getName(), $level);
+                        $location = $gameMap->getTeamLocation($team->getId(), $level);
                         if($location === null) continue;
                         foreach($team->getPlayers() as $player) {
                             $player->playSound("random.explode", 5.0, 1.0, [$player]);
                             $player->setImmobile(false);
                             $player->sendTitle(TextFormat::DARK_AQUA."LET'S FIGHT!", TextFormat::GRAY."Good luck!");
                             if($player->distanceSquared($location) > 0.25) {
-                                $player->teleport($gameMap->getTeamLocation($team->getName(), $level));
+                                $player->teleport($gameMap->getTeamLocation($team->getId(), $level));
                             }
                         }
                     }
@@ -120,7 +120,7 @@ class KitPvPMinigame extends Minigame {
             $level = $this->getMap()->getLevel();
             $session->getGameSession()->setLevel($level);
             foreach($session->getTeams() as $team) {
-                $location = $gameMap->getTeamLocation($team->getName(), $level);
+                $location = $gameMap->getTeamLocation($team->getId(), $level);
                 if($location === null){
                     Logger::error("Team " . $team->getName() . " is not valid!");
                     continue;
@@ -131,7 +131,7 @@ class KitPvPMinigame extends Minigame {
                     $player->setGamemode(0);
                     $player->setHealth($player->getMaxHealth());
                     $player->setFood($player->getMaxFood());
-                    $player->teleport($gameMap->getTeamLocation($team->getName(), $level));
+                    $player->teleport($gameMap->getTeamLocation($team->getId(), $level));
                     $player->setImmobile(true);
                     $player->setNameTag($color.$player->getName());
                     $player->setDisplayName($color.$player->getName());

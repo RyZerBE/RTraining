@@ -12,11 +12,10 @@ use pocketmine\Server;
 use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\session\SessionManager;
+use function method_exists;
 
 class EntityDamageListener implements Listener {
-
     /**
-     * @param EntityDamageEvent $event
      * @priority LOW
      */
     public function onEntityDamage(EntityDamageEvent $event): void {
@@ -31,6 +30,14 @@ class EntityDamageListener implements Listener {
                 return;
             }
             $settings = $minigame->getSettings();
+            $session = $minigame->getSessionManager()->getSessionByPlayer($entity);
+            $gameSession = $session->getGameSession();
+            if(method_exists($gameSession, "isRunning")) {
+                if(!$gameSession->isRunning()) {
+                    $event->setCancelled();
+                    return;
+                }
+            }
 
             if($event instanceof EntityDamageByEntityEvent) {
                 $damager = $event->getDamager();

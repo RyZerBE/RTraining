@@ -102,11 +102,7 @@ class Session {
     }
 
     public function addTeam(Team $team): void{
-        $this->teams[$team->getName()] = $team;
-    }
-
-    public function getTeam(string $team): ?Team {
-        return $this->teams[$team] ?? null;
+        $this->teams[$team->getId()] = $team;
     }
 
     public function getTeamByPlayer(Player|string $player): ?Team {
