@@ -12,14 +12,11 @@ use ryzerbe\training\gameserver\minigame\type\kitpvp\KitPvPMinigame;
 use ryzerbe\training\gameserver\util\Logger;
 use function boolval;
 use function count;
+use function in_array;
 use function intval;
 use function json_decode;
 
 class CloudPacketReceiveListener implements Listener{
-
-    /**
-     * @param CloudPacketReceiveEvent $event
-     */
     public function onPacketReceive(CloudPacketReceiveEvent $event): void {
         $packet = $event->getCloudPacket();
 
@@ -46,11 +43,9 @@ class CloudPacketReceiveListener implements Listener{
                     $request->setTeams($teams);
                 }
 
-                if($minigame instanceof KitPvPMinigame) {
-                    $kitName = $packet->getValue("kitName") ?? null;
-                    if($kitName !== null) {
-                        $request->addExtraData("kitName", $kitName);
-                    }
+                foreach($packet->data as $key => $value) {
+                    if(in_array($key, ["minigame", "players", "teams"])) continue;
+                    $request->addExtraData($key, $value);
                 }
                 MatchQueue::addQueue($request);
             }else {
