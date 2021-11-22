@@ -23,7 +23,7 @@ class KitPvPMinigame extends Minigame {
     use MapManagerTrait;
 
     public function __construct(){
-        KitManager::getInstance()->loadKits();
+        KitManager::getInstance()->loadKits(function(): void {});
         $this->loadMaps();
         parent::__construct();
     }

@@ -50,7 +50,7 @@ class MLGRushGameSession extends GameSession {
 
     public function __construct(Session $session, ?Level $level){
         parent::__construct($session, $level);
-        $this->registerItems("MLGRush", [
+        $this->registerItems($session->getMinigame()->getName(), null, [
             "stick" => ItemUtils::addEnchantments(Item::get(ItemIds::STICK)->setCustomName("§r§aStick"), [
                 Enchantment::KNOCKBACK => 1
             ]),

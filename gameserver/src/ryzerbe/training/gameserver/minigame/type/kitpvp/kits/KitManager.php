@@ -2,6 +2,7 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp\kits;
 
+use Closure;
 use mysqli;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
@@ -71,7 +72,7 @@ class KitManager {
         unset($this->kits[$kit]);
     }
 
-    public function loadKits(): void{
+    public function loadKits(Closure $closure): void{
         AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli): array{
             $res = $mysqli->query("SELECT * FROM kitpvp_kits");
             if($res->num_rows <= 0) return [];
@@ -82,11 +83,12 @@ class KitManager {
             }
 
             return $kits;
-        }, function(Server $server, array $result): void{
+        }, function(Server $server, array $result) use ($closure): void{
             foreach($result as $data) {
                 $kit = new Kit($data["name"], unserialize(zlib_decode(base64_decode($data["items"]))), unserialize(zlib_decode(base64_decode($data["armor"]))));
                 KitManager::getInstance()->registerKit($kit);
             }
+            ($closure)();
         });
     }
 }

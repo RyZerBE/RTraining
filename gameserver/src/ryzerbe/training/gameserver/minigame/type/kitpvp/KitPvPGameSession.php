@@ -2,6 +2,7 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp;
 
+use pocketmine\level\Level;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\statssystem\provider\StatsAsyncProvider;
@@ -13,6 +14,7 @@ use ryzerbe\training\gameserver\minigame\trait\MinigameStatesTrait;
 use ryzerbe\training\gameserver\minigame\trait\TeamEloTrait;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\Kit;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\KitManager;
+use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\util\Countdown;
 use ryzerbe\training\gameserver\util\ScoreboardUtils;
 use function array_rand;
@@ -29,6 +31,15 @@ class KitPvPGameSession extends GameSession {
     private ?Countdown $countdown;
     public int $tick = 0;
     public ?Kit $kit = null;
+
+    public function __construct(Session $session, ?Level $level){
+        parent::__construct($session, $level);
+        $minigame = $session->getMinigame()->getName();
+        foreach(KitManager::getInstance()->getKits() as $kit) {
+            //TODO: Do not register the items every time
+            $this->registerItems($minigame, $kit->getName(), $kit->getItems());
+        }
+    }
 
     public function loadPlayerKits(): void{
         $session = $this->getSession();

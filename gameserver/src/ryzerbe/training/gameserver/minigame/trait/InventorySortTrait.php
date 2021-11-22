@@ -23,17 +23,27 @@ trait InventorySortTrait {
     /**
      * @param Item[] $items
      */
-    public function registerItems(string $minigame, array $items): void {
+    public function registerItems(string $minigame, ?string $key, array $items): void {
         foreach($items as $identifier => $item) {
-            $this->items[$minigame][$identifier] = ItemUtils::addItemTag($item, $identifier, "minigame");
+            if($key !== null) {
+                $this->items[$minigame][$key][$identifier] = ItemUtils::addItemTag($item, $identifier, "minigame");
+            } else {
+                $this->items[$minigame][$identifier] = ItemUtils::addItemTag($item, $identifier, "minigame");
+            }
         }
     }
 
-    public function getItems(string $minigame): array{
+    public function getItems(string $minigame, ?string $key = null): array{
+        if($key !== null) {
+            return array_values($this->items[$minigame][$key] ?? []);
+        }
         return array_values($this->items[$minigame] ?? []);
     }
 
-    public function getItem(string $minigame, string $identifier): ?Item {
+    public function getItem(string $minigame, string $identifier, ?string $key = null): ?Item {
+        if($key !== null) {
+            return $this->items[$minigame][$key][$identifier] ?? null;
+        }
         return $this->items[$minigame][$identifier] ?? null;
     }
 
