@@ -23,6 +23,7 @@ class KitCommand extends Command {
         if(!$this->testPermission($sender)) return;
 
         if(empty($args[0])){
+            $sender->sendMessage("Yaw: ".$sender->getYaw()." | Pitch: ".$sender->getPitch());
             $sender->sendMessage(Training::PREFIX.TextFormat::RED."/kit <create|edit|delete> <KitName>");
             return;
         }

@@ -48,7 +48,23 @@ class MLGRushMinigame extends Minigame {
             new MLGRushMap("Line", "Neruxvace", [
                 new Location(128.5, 100, 128.5, 180.0, 0.0),
                 new Location(128.5, 100, 98.5, 0.0, 0.0),
-            ], new Location(128.5, 70, 10.5, 0.0, 0.0), $this, 92, 112)
+            ], new Location(128.5, 70, 10.5, 0.0, 0.0), $this, 92, 112),
+            new MLGRushMap("Flowers", "Neruxvace", [
+                new Location(128.5, 100, 128.5, 270.0, 0.0),
+                new Location(166.5, 100, 128.5, 90.0, 0.0),
+            ], new Location(147.5, 100, 128.5, 0.0, 0.0), $this, 92, 112),
+            new MLGRushMap("EndCube", "Unleqit", [
+                new Location(109.5, 105, 128.5, 270.0, 0.0),
+                new Location(147.5, 105, 128.5, 90.0, 0.0),
+            ], new Location(128.5, 100, 128.5, 0.0, 0.0), $this, 92, 112),
+            new MLGRushMap("Stone", "InTrouble", [
+                new Location(115.5, 99, 128.5, 270.0, 0.0),
+                new Location(141.5, 99, 128.5, 90.0, 0.0),
+            ], new Location(128.5, 100, 128.5, 0.0, 0.0), $this, 91, 111),
+            new MLGRushMap("Pizza", "AntiAC", [
+                new Location(128.5, 100, 162.5, 180.0, 0.0),
+                new Location(128.5, 100, 128.5, 0.0, 0.0),
+            ], new Location(128.5, 100, 128.5, 0.0, 0.0), $this, 91, 111),
         ];
     }
 
