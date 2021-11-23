@@ -275,6 +275,11 @@ class MLGRushMinigame extends Minigame {
         if($gameSession->isInfiniteBlocks()) {
             $player->getInventory()->setItemInHand($event->getItem()->setCount(64));
         }
+        if($gameSession->isWallsEnabled()) {
+            if(!$gameSession->getMapBoundingBox()->isVectorInXZ($block)) {
+                $event->setCancelled();
+            }
+        }
     }
 
     /**
@@ -312,6 +317,12 @@ class MLGRushMinigame extends Minigame {
 
             foreach($session->getOnlinePlayers() as $player) {
                 $player->playSound("firework.twinkle", 5.0, 1.0, [$player]);
+            }
+        }
+
+        if($gameSession->isWallsEnabled()) {
+            if(!$gameSession->getMapBoundingBox()->isVectorInXZ($block)) {
+                $event->setCancelled();
             }
         }
 

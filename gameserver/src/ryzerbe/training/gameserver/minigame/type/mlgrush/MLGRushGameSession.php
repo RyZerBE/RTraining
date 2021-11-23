@@ -7,6 +7,7 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\level\Level;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -39,7 +40,10 @@ class MLGRushGameSession extends GameSession {
     public const STATE_VOTING = 2;
 
     private bool $infiniteBlocks = true;
+    private bool $wallsEnabled = false;
     private int $maxPoints = PHP_INT_MAX;
+
+    private ?AxisAlignedBB $mapBoundingBox = null;
 
     private ?Countdown $countdown;
 
@@ -78,6 +82,14 @@ class MLGRushGameSession extends GameSession {
         $this->maxPoints = $points;
     }
 
+    public function isWallsEnabled(): bool{
+        return $this->wallsEnabled;
+    }
+
+    public function setWallsEnabled(bool $wallsEnabled): void{
+        $this->wallsEnabled = $wallsEnabled;
+    }
+
     public function getVotes(): int{
         return $this->votes;
     }
@@ -90,6 +102,14 @@ class MLGRushGameSession extends GameSession {
         return $this->voting;
     }
 
+    public function getMapBoundingBox(): ?AxisAlignedBB{
+        return $this->mapBoundingBox;
+    }
+
+    public function setMapBoundingBox(?AxisAlignedBB $mapBoundingBox): void{
+        $this->mapBoundingBox = $mapBoundingBox;
+    }
+
     public function vote(string $key, int|string $vote): void {
         if(!isset($this->voting[$key][$vote])){
             $this->voting[$key][$vote] = 0;
@@ -98,21 +118,18 @@ class MLGRushGameSession extends GameSession {
     }
 
     public function validateVoting(): void {
-        $pointsVoting = $this->getVoting()["points"];
-        $keys = array_keys($pointsVoting);
-        shuffle($keys);
-        $random = [];
-        foreach ($keys as $key) $random[$key] = $pointsVoting[$key];
-        arsort($random);
-        $this->setMaxPoints(array_key_first($random));
+        $this->setMaxPoints(array_key_first($this->getVoting()["points"]));
+        $this->setInfiniteBlocks(boolval(array_key_first($this->sortVoting($this->getVoting()["infiniteBlocks"]))));
+        $this->setWallsEnabled(boolval(array_key_first($this->sortVoting($this->getVoting()["wallsEnabled"]))));
+    }
 
-        $infiniteBlocksVoting = $this->getVoting()["infiniteBlocks"];
-        $keys = array_keys($infiniteBlocksVoting);
+    private function sortVoting(array $voting): array {
+        $keys = array_keys($voting);
         shuffle($keys);
         $random = [];
-        foreach ($keys as $key) $random[$key] = $infiniteBlocksVoting[$key];
+        foreach ($keys as $key) $random[$key] = $voting[$key];
         arsort($random);
-        $this->setInfiniteBlocks(boolval(array_key_first($random)));
+        return $voting;
     }
 
     public function getCountdown(): ?Countdown{
