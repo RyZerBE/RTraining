@@ -145,7 +145,7 @@ class KitPvPGameSession extends GameSession {
             ScoreboardUtils::createScoreboard($player, $this->getSession()->getMinigame()->getSettings()->PREFIX, "training");
             ScoreboardUtils::setScoreboardEntry($player, 0, "", "training");
             ScoreboardUtils::setScoreboardEntry($player, 1, TextFormat::GRAY."○ Kit", "training");
-            ScoreboardUtils::setScoreboardEntry($player, 2, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.(KitManager::getInstance()->playerKit[$player->getName()] ?? "???"), "training");
+            ScoreboardUtils::setScoreboardEntry($player, 2, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.($this->getKit()?->getName()) ?? "???", "training");
             ScoreboardUtils::setScoreboardEntry($player, 3, "", "training");
             ScoreboardUtils::setScoreboardEntry($player, 4, TextFormat::GRAY."○ Map", "training");
             ScoreboardUtils::setScoreboardEntry($player, 5, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$this->getSession()->getMinigame()->getMap()->getGameMap()->getMapName(), "training");

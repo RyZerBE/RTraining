@@ -10,7 +10,6 @@ use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\Server;
 use ryzerbe\core\util\async\AsyncExecutor;
-use ryzerbe\core\util\ItemUtils;
 use function array_values;
 use function count;
 use function json_decode;
@@ -18,7 +17,6 @@ use function strtolower;
 
 trait InventorySortTrait {
     private array $items = [];
-    private array $inventories = [];
 
     /**
      * @param Item[] $items
@@ -26,9 +24,9 @@ trait InventorySortTrait {
     public function registerItems(string $minigame, ?string $key, array $items): void {
         foreach($items as $identifier => $item) {
             if($key !== null) {
-                $this->items[$minigame][$key][$identifier] = ItemUtils::addItemTag($item, $identifier, "minigame");
+                $this->items[$minigame][$key][$identifier] = $item;
             } else {
-                $this->items[$minigame][$identifier] = ItemUtils::addItemTag($item, $identifier, "minigame");
+                $this->items[$minigame][$identifier] = $item;
             }
         }
     }
@@ -48,11 +46,6 @@ trait InventorySortTrait {
     }
 
     public function loadInventory(Player $player, string $minigame, ?string $key, ?Closure $closure): void {
-        if(isset($this->inventories[$player->getName()])) {
-            $player->getInventory()->setContents($this->inventories[$player->getName()]);
-            if($closure !== null) ($closure)();
-            return;
-        }
         $playername = $player->getName();
         AsyncExecutor::submitMySQLAsyncTask("Training", function(mysqli $mysqli) use ($minigame, $playername, $key): ?string {
             $table = strtolower($minigame) . "_inventory_sort";
@@ -63,15 +56,15 @@ trait InventorySortTrait {
             }
             if($query->num_rows <= 0) return null;
             return $query->fetch_assoc()["inventory"];
-        }, function(Server $server, ?string $result) use ($player, $minigame, $closure): void {
+        }, function(Server $server, ?string $result) use ($player, $minigame, $closure, $key): void {
             if(!$player->isConnected()) return;
-            $defaultItems = $this->getItems($minigame);
+            $defaultItems = $this->getItems($minigame, $key);
             $items = [];
             if($result === null || empty($decode = @json_decode($result, true))) {
                 $items = $defaultItems;
             } else {
                 foreach($decode as $slot => $item) {
-                    $item = $this->getItem($minigame, $item);
+                    $item = $this->getItem($minigame, $item, $key);
                     if($item === null) continue;
                     $items[$slot] = $item;
                 }
@@ -79,7 +72,6 @@ trait InventorySortTrait {
             if(count($defaultItems) !== count($items)) {
                 $items = $defaultItems;
             }
-            $this->inventories[$player->getName()] = $items;
             $player->getInventory()->setContents($items);
             if($closure !== null) ($closure)();
         });
