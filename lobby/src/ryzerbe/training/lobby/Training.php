@@ -17,6 +17,7 @@ use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
+use ryzerbe\core\entity\Hologram;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\util\ItemUtils;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
@@ -34,6 +35,7 @@ use ryzerbe\training\lobby\minigame\setting\NPCSettings;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\scheduler\TrainingTask;
 use ryzerbe\training\lobby\util\SkinUtils;
+use function file_get_contents;
 use function uniqid;
 
 class Training extends PluginBase {
@@ -88,6 +90,16 @@ class Training extends PluginBase {
             }
         }
 
+        $config = new Config("/root/RyzerCloud/data/NPC/default_geometry.json");
+        // MLGRush Queue skin \\
+        $mlgSkinQueue = new Skin(
+            uniqid(),
+            SkinUtils::readImage("/root/RyzerCloud/data/NPC/mlgrush.png"),
+            "",
+            "geometry.mlgrush",
+            file_get_contents("/root/RyzerCloud/data/NPC/geo_mlgrush.json")
+        );
+
         MinigameManager::getInstance()->registerMinigames(
             (new Minigame("MLGRush"))
                 ->setElo(true)
@@ -105,7 +117,7 @@ class Training extends PluginBase {
                 ])
                 ->setNpcSettings(new NPCSettings(
                     new Location(4.5, 115, 10.5, 180, 0, $level),
-                    $skin,
+                    $mlgSkinQueue,
                     TextFormat::LIGHT_PURPLE.TextFormat::BOLD."M".TextFormat::WHITE."L".TextFormat::LIGHT_PURPLE."GRush ".TextFormat::EOL.TextFormat::WHITE."Prove your skills".TextFormat::EOL.TextFormat::GREEN."✔ Elo enabled ✔",
                     null, "MLGRush"
                 ))
