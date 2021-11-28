@@ -208,8 +208,8 @@ class ClutchesMinigame extends Minigame {
         $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
         if(!$gameSession instanceof ClutchesGameSession) return;
 
-        $block = $event->getBlock();
-        $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $block->getPickedItem()->setCount(64));
+        //$block = $event->getBlock();
+        //$player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $block->getPickedItem()->setCount(64));
         $gameSession->setLastBlockTime(microtime(true));
     }
 }

@@ -22,8 +22,8 @@ use function spl_object_id;
 
 class ClutchesEntity extends Human implements ChunkLoader {
     public function __construct(Location $location, Skin $skin){
-        $location->getLevelNonNull()->loadChunk($location->x >> 4, $location->z >> 4);
         $this->skin = $skin;
+        $this->getLevel()->registerChunkLoader($this, $location->x >> 4, $location->z >> 4, true);
         parent::__construct($location->getLevelNonNull(), Entity::createBaseNBT($location, null, $location->yaw, $location->pitch));
     }
 
@@ -42,7 +42,7 @@ class ClutchesEntity extends Human implements ChunkLoader {
             if($viewer instanceof Player) {
                 $dist = $this->distanceSquared($viewer);
                 $dir = $viewer->subtract($this);
-                $dir = $dist <= 0?$dir:$dir->divide($dist);
+                $dir = $dist <= 0 ? $dir : $dir->divide($dist);
 
                 $yaw = rad2deg(atan2(-$dir->getX(), $dir->getZ()));
                 $pitch = rad2deg(atan(-$dir->getY()));

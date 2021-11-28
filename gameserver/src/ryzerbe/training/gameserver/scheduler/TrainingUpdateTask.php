@@ -63,7 +63,10 @@ class TrainingUpdateTask extends Task {
             }
 
             $player->sendTitle(TextFormat::RED."Searching Session", str_repeat(TextFormat::GOLD."▪ ", $this->points).((3 - $this->points) > 0 ? str_repeat(TextFormat::DARK_GRAY."▪ ", (3 - $this->points)) : ""), 0, 20, 0);
-            if($this->points >= 3) $this->points = 0;
+        }
+
+        if($this->points >= 3){
+            $this->points = 0;
         }
     }
 }

@@ -10,11 +10,7 @@ use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
 use ryzerbe\training\gameserver\util\WaitingQueue;
 
 class PlayerJoinListener implements Listener {
-
-    /**
-     * @param PlayerJoinEvent $event
-     */
-    public function onJoin(PlayerJoinEvent $event){
+    public function onJoin(PlayerJoinEvent $event): void{
         $player = $event->getPlayer();
         $event->setJoinMessage("");
         $player->setImmobile();
@@ -22,7 +18,7 @@ class PlayerJoinListener implements Listener {
         $player->addEffect(new EffectInstance(Effect::getEffect(Effect::BLINDNESS), 20 * 30, 3, false));
     }
 
-    public function onAuth(RyZerPlayerAuthEvent $event){
+    public function onAuth(RyZerPlayerAuthEvent $event): void{
         WaitingQueue::addPlayer($event->getRyZerPlayer()->getPlayer());
     }
 }

@@ -7,13 +7,21 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\level\ChunkLoader;
 use pocketmine\level\format\Chunk;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\utils\TextFormat;
 use ryzerbe\training\gameserver\minigame\type\aimtrainer\AimTrainerGameSession;
 use ryzerbe\training\gameserver\session\SessionManager;
 use function spl_object_id;
 
 class AimTrainerEntity extends Villager implements ChunkLoader {
+
+    public function __construct(Level $level, CompoundTag $nbt){
+        parent::__construct($level, $nbt);
+        $location = $this->getLocation();
+        $this->getLevel()->registerChunkLoader($this, $location->x >> 4, $location->z >> 4, true);
+    }
 
     public function attack(EntityDamageEvent $source): void{
         $this->setHealth(20.0);
