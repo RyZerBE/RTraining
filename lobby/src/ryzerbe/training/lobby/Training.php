@@ -35,6 +35,7 @@ use ryzerbe\training\lobby\minigame\MinigameManager;
 use ryzerbe\training\lobby\minigame\setting\NPCSettings;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\scheduler\TrainingTask;
+use ryzerbe\training\lobby\util\LevelSettings;
 use ryzerbe\training\lobby\util\SkinUtils;
 use function file_get_contents;
 use function json_encode;
@@ -68,6 +69,8 @@ class Training extends PluginBase {
             new EnchantCommand(),
             new BetaCommand(),
         ]);
+
+        Server::getInstance()->getDefaultLevel()->setTime(LevelSettings::TIME);
     }
 
     public function initAll(): void{
