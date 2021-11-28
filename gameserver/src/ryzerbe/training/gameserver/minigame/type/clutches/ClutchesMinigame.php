@@ -70,7 +70,6 @@ class ClutchesMinigame extends Minigame {
                 }
                 $ms = $time - microtime(true);
                 if($ms <= 0) {
-                   // $player->sendActionBarMessage(TextFormat::RED.TextFormat::BOLD."HIT!");
                     $session = SessionManager::getInstance()->getSessionOfPlayer($player);
                     if($session === null) {
                         HitQueue::removeQueue($playerName);
@@ -193,6 +192,7 @@ class ClutchesMinigame extends Minigame {
         $player = $event->getEntity();
         if(!$player instanceof Player) return;
         if($event->getCause() != EntityDamageEvent::CAUSE_VOID) return;
+        $player->setHealth(20);
 
         $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
         if(!$gameSession instanceof ClutchesGameSession) return;

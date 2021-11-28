@@ -21,6 +21,8 @@ class ClutchesSettings extends MinigameSettings {
 
     public bool $canPlace = true;
     public bool $inventoryTransactions = true;
+    public bool $damage = true;
+
     public ?ClutchesEntity $entity = null;
     public float $seconds = 5.0;
     public int $hit = self::ONE_HIT;
