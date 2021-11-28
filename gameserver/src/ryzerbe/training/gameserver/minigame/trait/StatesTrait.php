@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ryzerbe\training\gameserver\minigame\trait;
 
-trait MinigameStatesTrait {
+trait StatesTrait {
     private bool $running = false;
 
     private int $state = -1;

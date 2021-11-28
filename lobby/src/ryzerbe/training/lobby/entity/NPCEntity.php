@@ -43,15 +43,18 @@ class NPCEntity extends Human implements ChunkLoader {
     private ?string $group = null;
     private ?string $queue = null;
 
+    protected $gravity = 0.0;
+
     public function __construct(Location|Level $location, Skin|CompoundTag $skin){
         if($location instanceof Level) {
             parent::__construct($location, $skin);
             $this->flagForDespawn();
             return;
         }
-        $location->getLevelNonNull()->loadChunk($location->x >> 4, $location->z >> 4);
         $this->skin = $skin;
-        parent::__construct($location->getLevelNonNull(), Entity::createBaseNBT($location, null, $location->yaw, $location->pitch));
+        $level = $location->getLevelNonNull();
+        $level->registerChunkLoader($this, $location->x >> 4, $location->z >> 4, true);
+        parent::__construct($level, Entity::createBaseNBT($location, null, $location->yaw, $location->pitch));
     }
 
     public function updateTitle(string $title, string $subtitle): void{

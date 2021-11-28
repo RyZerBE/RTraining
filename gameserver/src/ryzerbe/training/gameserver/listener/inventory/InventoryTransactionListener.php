@@ -17,7 +17,8 @@ class InventoryTransactionListener implements Listener {
         if($player->isCreative(true)) return;
         $minigame = MinigameManager::getMinigameByPlayer($player);
         if($minigame === null) {
-            $event->setCancelled();//TODO: Cancel event?
+            if($player->isCreative()) return;
+            $event->setCancelled();
             return;
         }
         if(!$minigame->getSettings()->inventoryTransactions) {

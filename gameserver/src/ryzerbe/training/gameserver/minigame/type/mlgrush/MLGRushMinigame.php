@@ -142,6 +142,11 @@ class MLGRushMinigame extends Minigame {
                         $gameSession->stopCountdown();
                         $gameMap = $this->getMap()->getGameMap();
                         $level = $this->getMap()->getLevel();
+
+                        if($gameSession->isRushProtection()) {
+                            $gameSession->hideBeds();
+                        }
+
                         foreach($session->getTeams() as $team) {
                             $location = $gameMap->getTeamLocation($team->getId(), $level);
                             if($location === null) continue;
@@ -166,7 +171,8 @@ class MLGRushMinigame extends Minigame {
                         foreach($session->getOnlinePlayers() as $player) {
                             $player->sendTitle(TextFormat::DARK_AQUA."VOTING ENDED", TextFormat::GREEN.implode("\n".TextFormat::GREEN, [
                                     "Points ".TextFormat::GRAY."» ".($gameSession->getMaxPoints() >= PHP_INT_MAX ? TextFormat::RED."Endless" : TextFormat::GREEN.$gameSession->getMaxPoints()),
-                                    "Infinite Blocks ".TextFormat::GRAY."» ".($gameSession->isInfiniteBlocks() ? TextFormat::GREEN."Enabled" : TextFormat::RED."Disabled")
+                                    "Infinite Blocks ".TextFormat::GRAY."» ".($gameSession->isInfiniteBlocks() ? TextFormat::GREEN."Enabled" : TextFormat::RED."Disabled"),
+                                    "Rush Protection ".TextFormat::GRAY."» ".($gameSession->isRushProtection() ? TextFormat::GREEN."Enabled" : TextFormat::RED."Disabled"),
                                 ]));
                         }
                         $gameSession->startCountdown(8, Countdown::START);
@@ -178,6 +184,13 @@ class MLGRushMinigame extends Minigame {
             return true;
         }
         $gameSession->tick++;
+        if($gameSession->getBedPlaceTime() === $gameSession->tick) {
+            $gameSession->spawnBeds();
+
+            foreach($session->getOnlinePlayers() as $player) {
+                $player->sendMessage($gameSession->getSettings()->PREFIX.LanguageProvider::getMessageContainer("rush-protection-time-ended", $player));
+            }
+        }
         foreach($session->getOnlinePlayers() as $player) {
             $player->sendActionBarMessage(TextFormat::GRAY.TimeAPI::convert($gameSession->tick)->asString()."\n".(
                     $gameSession->getSettings()->elo ? LanguageProvider::getMessageContainer("elo-enabled", $player) : TextFormat::AQUA."discord.ryzer.be"

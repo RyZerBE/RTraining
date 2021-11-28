@@ -11,7 +11,9 @@ use ryzerbe\training\gameserver\game\team\Team;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\session\SessionManager;
+use ryzerbe\training\gameserver\session\TournamentSession;
 use ryzerbe\training\gameserver\util\Logger;
+use function boolval;
 use function implode;
 use function time;
 
@@ -75,6 +77,19 @@ class MatchRequest {
         $minigame = MinigameManager::getMinigame($this->minigameName);
         $playerNames = $this->playerNames;
 
+        MatchQueue::removeQueue($this);
+        if(boolval($this->getExtraData()["tournament"] ?? false)) {
+            $session = new TournamentSession($playerNames, $minigame->getName(), $this->getExtraData());
+            foreach($session->getOnlinePlayers() as $player) {
+                $player->sendTitle(TextFormat::GREEN."Session found", TextFormat::GRAY."loading game..");
+                $player->playSound("random.levelup", 5.0, 1.0, [$player]);
+                $player->removeAllEffects();
+            }
+            SessionManager::getInstance()->addSession($session);
+            $session->load();
+            return;
+        }
+
         $session = new Session($playerNames, $minigame->getName(), $this->getExtraData());
 
         $id = -1;
@@ -99,7 +114,6 @@ class MatchRequest {
 
         $gameSession = $session->getGameSession();
         $gameSession->getSettings()->elo = $this->elo;
-        MatchQueue::removeQueue($this);
         $minigame->onLoad($session);
     }
 

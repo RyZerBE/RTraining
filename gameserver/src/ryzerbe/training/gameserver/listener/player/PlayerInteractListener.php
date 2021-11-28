@@ -21,6 +21,7 @@ class PlayerInteractListener implements Listener {
         if(!$player instanceof Player) return;
         $minigame = MinigameManager::getMinigameByPlayer($player);
         if($minigame === null) {
+            if($player->isCreative()) return;
             $event->setCancelled();
             return;
         }

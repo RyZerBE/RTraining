@@ -2,6 +2,8 @@
 
 namespace ryzerbe\training\lobby;
 
+use BauboLP\Cloud\CloudBridge;
+use BauboLP\Cloud\Packets\MatchPacket;
 use jojoe77777\FormAPI\CustomForm;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\block\BlockIds;
@@ -17,7 +19,6 @@ use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
-use ryzerbe\core\entity\Hologram;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\util\ItemUtils;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
@@ -36,6 +37,7 @@ use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\scheduler\TrainingTask;
 use ryzerbe\training\lobby\util\SkinUtils;
 use function file_get_contents;
+use function json_encode;
 use function uniqid;
 
 class Training extends PluginBase {
@@ -177,6 +179,35 @@ class Training extends PluginBase {
 
     private function initExtraNPCs(Skin $skin): void {
         $level = Server::getInstance()->getDefaultLevel();
+
+        // Tournament Queue \\
+        $tournamentQueueSkin = new Skin(
+            uniqid(),
+            SkinUtils::readImage("/root/RyzerCloud/data/NPC/cwqueue.png"),
+            "",
+            "geometry.cwqueue",
+            file_get_contents("/root/RyzerCloud/data/NPC/geo_cwqueue.json")
+        );
+        $closure = function(Player $player, NPCEntity $entity): void {
+            if(!$player->isOp()) return;
+            $pk = new MatchPacket();
+            $pk->addData("group", "Training");
+            $pk->addData("minigame", "MLGRush");
+            $pk->addData("tournament", "1");
+            $pk->addData("players", json_encode([$player->getName()]));
+            CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+        };
+        $npcEntity = new NPCEntity(new Location(1.5, 117, -49.5, 0, 0, $level), $tournamentQueueSkin);
+        $npcEntity->updateTitle(TextFormat::BLUE.TextFormat::BOLD."Tournament", TextFormat::WHITE."Soon");
+        $npcEntity->setInteractClosure($closure);
+        $npcEntity->setAttackClosure($closure);
+        $npcEntity->spawnToAll();
+
+        // GameZone \\
+        $npcEntity = new NPCEntity(new Location(2.5, 117, 23.5, 0, 0, $level), $skin);
+        $npcEntity->updateTitle(TextFormat::BOLD.TextFormat::GOLD."» ".TextFormat::RESET.TextFormat::GREEN.TextFormat::BOLD."Game Zone".TextFormat::RESET.TextFormat::BOLD.TextFormat::GOLD." «", "");
+        $npcEntity->spawnToAll();
+        $npcEntity->setScale(0.00000001);
 
         // ??? \\
         $npcEntity = new NPCEntity(new Location(-3.5, 115, -4.5, 0, 0, $level), $skin);

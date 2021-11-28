@@ -18,6 +18,7 @@ class BlockPlaceListener implements Listener {
         $player = $event->getPlayer();
         $minigame = MinigameManager::getMinigameByPlayer($player);
         if($minigame === null) {
+            if($player->isCreative()) return;
             $event->setCancelled();
             return;
         }

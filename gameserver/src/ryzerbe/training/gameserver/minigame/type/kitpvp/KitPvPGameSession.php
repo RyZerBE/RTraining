@@ -10,7 +10,7 @@ use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\team\Team;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
 use ryzerbe\training\gameserver\minigame\trait\InventorySortTrait;
-use ryzerbe\training\gameserver\minigame\trait\MinigameStatesTrait;
+use ryzerbe\training\gameserver\minigame\trait\StatesTrait;
 use ryzerbe\training\gameserver\minigame\trait\TeamEloTrait;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\Kit;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\KitManager;
@@ -24,7 +24,7 @@ use function pow;
 
 class KitPvPGameSession extends GameSession {
     use BlockStorageTrait;
-    use MinigameStatesTrait;
+    use StatesTrait;
     use TeamEloTrait;
     use InventorySortTrait;
 

@@ -20,6 +20,7 @@ class BlockBreakListener implements Listener {
         $block = $event->getBlock();
         $minigame = MinigameManager::getMinigameByPlayer($player);
         if($minigame === null) {
+            if($player->isCreative()) return;
             $event->setCancelled();
             return;
         }

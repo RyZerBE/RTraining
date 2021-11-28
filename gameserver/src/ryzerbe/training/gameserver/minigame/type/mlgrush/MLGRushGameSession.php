@@ -2,6 +2,7 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\mlgrush;
 
+use pocketmine\block\Bed;
 use pocketmine\block\BlockIds;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item;
@@ -10,6 +11,8 @@ use pocketmine\level\Level;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\tile\Bed as TileBed;
+use pocketmine\tile\Tile;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\util\ItemUtils;
 use ryzerbe\statssystem\provider\StatsAsyncProvider;
@@ -17,7 +20,7 @@ use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\team\Team;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
 use ryzerbe\training\gameserver\minigame\trait\InventorySortTrait;
-use ryzerbe\training\gameserver\minigame\trait\MinigameStatesTrait;
+use ryzerbe\training\gameserver\minigame\trait\StatesTrait;
 use ryzerbe\training\gameserver\minigame\trait\TeamEloTrait;
 use ryzerbe\training\gameserver\minigame\trait\TeamPointsTrait;
 use ryzerbe\training\gameserver\session\Session;
@@ -33,7 +36,7 @@ use function shuffle;
 class MLGRushGameSession extends GameSession {
     use BlockStorageTrait;
     use TeamPointsTrait;
-    use MinigameStatesTrait;
+    use StatesTrait;
     use InventorySortTrait;
     use TeamEloTrait;
 
@@ -41,6 +44,7 @@ class MLGRushGameSession extends GameSession {
 
     private bool $infiniteBlocks = true;
     private bool $wallsEnabled = false;
+    private bool $rushProtection = false;
     private int $maxPoints = PHP_INT_MAX;
 
     private ?AxisAlignedBB $mapBoundingBox = null;
@@ -90,6 +94,14 @@ class MLGRushGameSession extends GameSession {
         $this->wallsEnabled = $wallsEnabled;
     }
 
+    public function isRushProtection(): bool{
+        return $this->rushProtection;
+    }
+
+    public function setRushProtection(bool $rushProtection): void{
+        $this->rushProtection = $rushProtection;
+    }
+
     public function getVotes(): int{
         return $this->votes;
     }
@@ -121,6 +133,7 @@ class MLGRushGameSession extends GameSession {
         $this->setMaxPoints(array_key_first($this->getVoting()["points"]));
         $this->setInfiniteBlocks(boolval(array_key_first($this->sortVoting($this->getVoting()["infiniteBlocks"]))));
         $this->setWallsEnabled(boolval(array_key_first($this->sortVoting($this->getVoting()["wallsEnabled"]))));
+        $this->setRushProtection(boolval(array_key_first($this->sortVoting($this->getVoting()["rushProtection"]))));
     }
 
     private function sortVoting(array $voting): array {
@@ -165,6 +178,10 @@ class MLGRushGameSession extends GameSession {
         $this->resetBlocks();
         foreach($this->getSession()->getOnlinePlayers() as $player) {
             $this->resetPlayer($player);
+        }
+
+        if($this->isRushProtection()) {
+            $this->hideBeds();
         }
     }
 
@@ -254,6 +271,66 @@ class MLGRushGameSession extends GameSession {
             ScoreboardUtils::setScoreboardEntry($player, ++$line, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$minigame->getMap()->getGameMap()->getMapName(), "training");
             ScoreboardUtils::setScoreboardEntry($player, ++$line, "", "training");
             ScoreboardUtils::setScoreboardEntry($player, ++$line, TextFormat::WHITE."⇨ ".TextFormat::AQUA."ryzer.be", "training");
+        }
+    }
+
+    protected array $bedBlocks = [];
+    protected int $bedPlaceTime = -1;
+
+    public function getBedPlaceTime(): int{
+        return $this->bedPlaceTime;
+    }
+
+    public function hideBeds(): void {
+        /** @var MLGRushMinigame $minigame */
+        $minigame = $this->getSession()->getMinigame();
+        $map = $minigame->getMap();
+        $level = $map->getLevel();
+
+        $this->bedPlaceTime = $this->tick + 10;
+
+        if(!empty($this->bedBlocks)) {
+            foreach($this->bedBlocks as $bedBlock) {
+                $level->setBlockIdAt($bedBlock[0]->x, $bedBlock[0]->y, $bedBlock[0]->z, 0);
+                $level->setBlockDataAt($bedBlock[0]->x, $bedBlock[0]->y, $bedBlock[0]->z, 0);
+                $level->setBlockIdAt($bedBlock[1]->x, $bedBlock[1]->y, $bedBlock[1]->z, 0);
+                $level->setBlockDataAt($bedBlock[1]->x, $bedBlock[1]->y, $bedBlock[1]->z, 0);
+            }
+            return;
+        }
+
+        foreach($level->getTiles() as $tile) {
+            if(!$tile instanceof TileBed || $tile->isClosed()) continue;
+            $block = $tile->getBlock();
+            if(!$block instanceof Bed) continue;
+            $otherHalfBlock = $block->getOtherHalf();
+
+            $this->bedBlocks[] = [$block, $otherHalfBlock, $tile->getColor()];
+
+            $level->setBlockIdAt($block->getFloorX(), $block->getFloorY(), $block->getFloorZ(), 0);
+            $level->setBlockDataAt($block->getFloorX(), $block->getFloorY(), $block->getFloorZ(), 0);
+            $level->setBlockIdAt($otherHalfBlock->getFloorX(), $otherHalfBlock->getFloorY(), $otherHalfBlock->getFloorZ(), 0);
+            $level->setBlockDataAt($otherHalfBlock->getFloorX(), $otherHalfBlock->getFloorY(), $otherHalfBlock->getFloorZ(), 0);
+
+            $tile->close();
+        }
+    }
+
+    public function spawnBeds(): void {
+        /** @var MLGRushMinigame $minigame */
+        $minigame = $this->getSession()->getMinigame();
+        $map = $minigame->getMap();
+        $level = $map->getLevel();
+
+        foreach($this->bedBlocks as $bedBlock) {
+            $level->setBlockIdAt($bedBlock[0]->x, $bedBlock[0]->y, $bedBlock[0]->z, $bedBlock[0]->getId());
+            $level->setBlockDataAt($bedBlock[0]->x, $bedBlock[0]->y, $bedBlock[0]->z, $bedBlock[0]->getDamage());
+
+            $level->setBlockIdAt($bedBlock[1]->x, $bedBlock[1]->y, $bedBlock[1]->z, $bedBlock[1]->getId());
+            $level->setBlockDataAt($bedBlock[1]->x, $bedBlock[1]->y, $bedBlock[1]->z, $bedBlock[1]->getDamage());
+
+            Tile::createTile(Tile::BED, $level, TileBed::createNBT($bedBlock[0]))->setColor($bedBlock[2]);
+            Tile::createTile(Tile::BED, $level, TileBed::createNBT($bedBlock[1]))->setColor($bedBlock[2]);
         }
     }
 }

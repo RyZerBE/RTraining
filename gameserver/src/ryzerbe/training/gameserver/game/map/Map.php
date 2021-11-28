@@ -12,22 +12,22 @@ use function popen;
 use function uniqid;
 
 class Map {
-    private GameMap $map;
-    private Session $session;
+    private ?GameMap $map;
+    private ?Session $session;
 
     private ?Level $level = null;
     private string $uniqueLevelName;
 
-    public function __construct(GameMap $map, Session $session){
+    public function __construct(?GameMap $map, ?Session $session){
         $this->map = $map;
         $this->session = $session;
     }
 
-    public function getSession(): Session{
+    public function getSession(): ?Session{
         return $this->session;
     }
 
-    public function getGameMap(): GameMap{
+    public function getGameMap(): ?GameMap{
         return $this->map;
     }
 
@@ -39,8 +39,9 @@ class Map {
         $this->level = $level;
     }
 
-    public function load(Closure $closure): void{
-        $levelName = $this->map->getMapName();
+    public function load(Closure $closure, ?string $mapName = null): void{
+        $levelName = $mapName ?? $this->map?->getMapName();
+        if($levelName === null) return;
         $dataPath = Server::getInstance()->getDataPath();
         $this->uniqueLevelName = $levelId = uniqid();
         AsyncExecutor::submitMySQLAsyncTask("Lobby", function() use ($levelName, $levelId, $dataPath): void {
@@ -49,7 +50,7 @@ class Map {
             $server = Server::getInstance();
             $server->loadLevel($levelId);
             $level = $server->getLevelByName($levelId);
-            $level->setTime(6000);
+            $level->setTime(1000);
             $level->stopTime();
             ($closure)();
         });

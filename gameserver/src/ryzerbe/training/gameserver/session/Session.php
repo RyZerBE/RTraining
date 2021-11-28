@@ -16,14 +16,14 @@ use function in_array;
 use function uniqid;
 
 class Session {
-    private string $uniqueId;
-    private array $players;
-    private array $extraData;
-    private string $minigame;
+    protected string $uniqueId;
+    protected array $players;
+    protected array $extraData;
+    protected string $minigame;
 
-    private ?GameSession $gameSession = null;
+    protected ?GameSession $gameSession = null;
     /** @var Team[]  */
-    private array $teams = [];
+    protected array $teams = [];
 
     public function __construct(array $players, string $minigame, array $extraData){
         $this->uniqueId = uniqid();

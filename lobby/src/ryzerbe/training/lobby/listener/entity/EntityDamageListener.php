@@ -43,6 +43,7 @@ class EntityDamageListener implements Listener {
                 }
             }
         } else {
+            if($player->isCreative()) return;
             $event->setCancelled();
             if(in_array($cause, [
                 EntityDamageEvent::CAUSE_VOID, EntityDamageEvent::CAUSE_SUFFOCATION

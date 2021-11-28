@@ -26,15 +26,27 @@ class PlayerMoveListener implements Listener {
         $level = $player->getLevel();
 
         if(
-            !$player->hasDelay("gamezone_cooldown") &&
-            $level->getBlock($player->down())->getId() === BlockIds::SLIME_BLOCK &&
-            $level->getBlock($player->down(3))->getId() === BlockIds::GOLD_BLOCK
+            !$player->hasDelay("boost_cooldown") &&
+            $level->getBlock($player->down())->getId() === BlockIds::SLIME_BLOCK
         ) {
-            $type = self::MOTION_TYPES[array_rand(self::MOTION_TYPES)];
-            $player->addDelay("gamezone_cooldown", 1);
-            $player->teleport(new Vector3(2.5, 116, 23.5));
-            $player->setMotion(new Vector3($type[0], $type[1], $type[2]));
-            $player->playSound("random.fizz", 100.0, 1.0, [$player]);
+            switch($level->getBlock($player->down(3))->getId()) {
+                case BlockIds::GOLD_BLOCK: {
+                    $type = self::MOTION_TYPES[array_rand(self::MOTION_TYPES)];
+                    $player->addDelay("boost_cooldown", 1);
+                    $player->teleport(new Vector3(2.5, 116, 23.5));
+                    $player->setMotion(new Vector3($type[0], $type[1], $type[2]));
+                    $player->playSound("random.fizz", 100.0, 1.0, [$player]);
+                    break;
+                }
+                case BlockIds::EMERALD_BLOCK: {
+                    $player->addDelay("boost_cooldown", 1);
+                    $motion = $player->getDirectionVector()->multiply(4.0);
+                    $motion->y = 1.0;
+                    $player->setMotion($motion);
+                    $player->playSound("random.fizz", 100.0, 1.0, [$player]);
+                    break;
+                }
+            }
         }
 
         /** @var GameZoneManager $gamezone */
