@@ -23,8 +23,8 @@ use function spl_object_id;
 class ClutchesEntity extends Human implements ChunkLoader {
     public function __construct(Location $location, Skin $skin){
         $this->skin = $skin;
-        $this->getLevel()->registerChunkLoader($this, $location->x >> 4, $location->z >> 4, true);
         parent::__construct($location->getLevelNonNull(), Entity::createBaseNBT($location, null, $location->yaw, $location->pitch));
+        $this->getLevel()->registerChunkLoader($this, $location->x >> 4, $location->z >> 4, true);
     }
 
     public function initEntity(): void{
