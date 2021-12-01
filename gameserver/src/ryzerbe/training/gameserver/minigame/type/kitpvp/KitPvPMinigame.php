@@ -144,9 +144,6 @@ class KitPvPMinigame extends Minigame {
     }
 
     public function onUnload(Session $session): void{
-        foreach($session->getOnlinePlayers() as $player) {
-            $player->getServer()->dispatchCommand($player, "leave");
-        }
         $this->getMap()->unload();
     }
 

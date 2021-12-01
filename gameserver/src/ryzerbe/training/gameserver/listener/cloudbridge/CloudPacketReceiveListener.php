@@ -7,6 +7,8 @@ use BauboLP\Cloud\Packets\MatchPacket;
 use pocketmine\event\Listener;
 use ryzerbe\training\gameserver\game\match\MatchQueue;
 use ryzerbe\training\gameserver\game\match\MatchRequest;
+use ryzerbe\training\gameserver\game\spectate\SpectateQueue;
+use ryzerbe\training\gameserver\game\spectate\SpectateRequest;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\util\Logger;
 use function boolval;
@@ -20,15 +22,21 @@ class CloudPacketReceiveListener implements Listener{
         $packet = $event->getCloudPacket();
 
         if($packet instanceof MatchPacket) {
-            $minigameName = $packet->getValue("minigame") ?? "Unknown";
-            $minigame = MinigameManager::getMinigame($minigameName);
-            if($minigame === null) {
-                Logger::error("Received MatchPacket with unknown minigame '".$minigameName."'");
-                return;
-            }
-
             $players = $packet->getValue("players");
             if($players !== null) {
+                $spectate = $packet->getValue("spectate");
+                if($spectate !== null) {
+                    SpectateQueue::addRequest(new SpectateRequest($players, $spectate));
+                    return;
+                }
+
+                $minigameName = $packet->getValue("minigame") ?? "Unknown";
+                $minigame = MinigameManager::getMinigame($minigameName);
+                if($minigame === null) {
+                    Logger::error("Received MatchPacket with unknown minigame '".$minigameName."'");
+                    return;
+                }
+
                 $players = json_decode($players, true);
                 if($minigame->getSettings()->maxPlayers < count($players)) {
                     Logger::error("Player count does not match with minigame max players");

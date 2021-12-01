@@ -7,6 +7,7 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\training\gameserver\game\match\MatchQueue;
+use ryzerbe\training\gameserver\game\spectate\SpectateQueue;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\session\SessionManager;
@@ -28,14 +29,26 @@ class TrainingUpdateTask extends Task {
             return $session instanceof TournamentSession;
         }) as $session) $session->onUpdate($currentTick);
 
-        foreach(MatchQueue::getRequests() as $matchRequest) {
-            if(!$matchRequest->isValid()) {
-                MatchQueue::removeQueue($matchRequest);
-                continue;
+        //We do not need to check every tick if the request is valid and can be proceeded
+        if($currentTick % 10 === 0) {
+            foreach(MatchQueue::getRequests() as $matchRequest) {
+                if(!$matchRequest->isValid()) {
+                    MatchQueue::removeQueue($matchRequest);
+                    continue;
+                }
+                if($matchRequest->progress()) {
+                    $matchRequest->accept();
+                }
             }
 
-            if($matchRequest->progress()) {
-                $matchRequest->accept();
+            foreach(SpectateQueue::getQueue() as $request) {
+                if(!$request->isValid()) {
+                    SpectateQueue::removeRequest($request);
+                    continue;
+                }
+                if($request->progress()) {
+                    $request->accept();
+                }
             }
         }
 
