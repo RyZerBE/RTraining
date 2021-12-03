@@ -6,6 +6,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\player\PlayerInteractEntityEvent;
 use pocketmine\Player;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\customitem\CustomItem;
 use ryzerbe\training\lobby\form\type\SelectMinigameForm;
 use ryzerbe\training\lobby\form\type\TeamRequestForm;
@@ -13,6 +14,11 @@ use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\Training;
 
 class ChallengeItem extends CustomItem {
+    public function giveToPlayer(PMMPPlayer $player, ?int $slot = null): void{
+        $this->item->setUnbreakable();
+        parent::giveToPlayer($player, $slot);
+    }
+
     public function onHit(EntityDamageByEntityEvent $event){
         $entity = $event->getEntity();
         $hitter = $event->getDamager();

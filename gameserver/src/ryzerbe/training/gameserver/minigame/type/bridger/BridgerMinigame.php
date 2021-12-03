@@ -173,9 +173,7 @@ class BridgerMinigame extends Minigame {
             $event->setCancelled();
             $entity = $event->getEntity();
             if(!$entity instanceof Player) return;
-            $session = SessionManager::getInstance()->getSessionOfPlayer($entity);
-            if($session === null) return;
-            $gameSession = $session->getGameSession();
+            $gameSession = SessionManager::getInstance()->getSessionOfPlayer($entity)?->getGameSession();
             if(!$gameSession instanceof BridgerGameSession) return;
             $gameSession->reset();
         }
