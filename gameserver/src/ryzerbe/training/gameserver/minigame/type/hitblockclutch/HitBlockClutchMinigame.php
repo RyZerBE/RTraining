@@ -17,6 +17,7 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\customitem\CustomItemManager;
@@ -25,6 +26,7 @@ use ryzerbe\training\gameserver\minigame\Minigame;
 use ryzerbe\training\gameserver\minigame\type\hitblockclutch\entity\HitBlockClutchEntity;
 use ryzerbe\training\gameserver\minigame\type\hitblockclutch\generator\HitBlockClutchGenerator;
 use ryzerbe\training\gameserver\minigame\type\hitblockclutch\item\HitBlockClutchMinigameConfigurationItem;
+use ryzerbe\training\gameserver\minigame\type\hitblockclutch\item\HitBlockClutchMinigameResetItem;
 use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\session\SessionManager;
 use ryzerbe\training\gameserver\util\MinigameDefaultSlots;
@@ -41,6 +43,7 @@ class HitBlockClutchMinigame extends Minigame {
         parent::__construct();
         CustomItemManager::getInstance()->registerAll([
             new HitBlockClutchMinigameConfigurationItem(Item::get(ItemIds::BOOK)->setCustomName(TextFormat::RED."Settings"), 8),
+            new HitBlockClutchMinigameResetItem(Item::get(ItemIds::DYE, 15)->setCustomName(TextFormat::RED."Reset"), 5),
         ]);
 
         GeneratorManager::addGenerator(HitBlockClutchGenerator::class, "hitblockclutch", true);
@@ -126,6 +129,7 @@ class HitBlockClutchMinigame extends Minigame {
     }
 
     public function onPlayerMove(PlayerMoveEvent $event): void {
+        /** @var PMMPPlayer $player */
         $player = $event->getPlayer();
         $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
         if(!$gameSession instanceof HitBlockClutchGameSession) return;
@@ -146,8 +150,9 @@ class HitBlockClutchMinigame extends Minigame {
 
                             $gameSession->stopTimer();
                             $gameSession->updateScore();
-                            $player->playSound("random.levelup", 5.0, 1.0, [$player]);
                             $gameSession->resetGame();
+                            $player->playSound("random.levelup", 5.0, 1.0, [$player]);
+                            $player->sendMessage($gameSession->getSettings()->PREFIX.LanguageProvider::getMessageContainer("hitblockclutch-end-reached", $player->getName(), ["#time" => number_format($gameSession->getScore(), 2)]));
                         }
                         return;
                     }
@@ -157,6 +162,7 @@ class HitBlockClutchMinigame extends Minigame {
                             $this->scheduleUpdate($gameSession->getSession());
 
                             $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, Item::get(BlockIds::SANDSTONE, 0, 64));
+                            CustomItemManager::getInstance()->getCustomItemByClass(HitBlockClutchMinigameResetItem::class)?->giveToPlayer($player, MinigameDefaultSlots::SLOT_OTHER_ITEM);
                         }
                     }
                 }
