@@ -29,4 +29,8 @@ trait BlockStorageTrait {
         }
         $this->blocks[$identifier] = [];
     }
+
+    public function resetAllBlocks(): void {
+        foreach($this->blocks as $identifier => $ignore) $this->resetBlocks($identifier);
+    }
 }

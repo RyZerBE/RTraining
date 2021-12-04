@@ -78,11 +78,11 @@ class AimTrainerMinigame extends Minigame {
 
     public function onDamage(EntityDamageEvent $event): void{
         if($event->getCause() === EntityDamageEvent::CAUSE_VOID) {
-            $event->setCancelled();
             $entity = $event->getEntity();
             if(!$entity instanceof Player) return;
             $gameSession = SessionManager::getInstance()->getSessionOfPlayer($entity)?->getGameSession();
             if(!$gameSession instanceof AimTrainerGameSession) return;
+            $event->setCancelled();
 
             $entity->teleport($gameSession->getSpawn());
         }

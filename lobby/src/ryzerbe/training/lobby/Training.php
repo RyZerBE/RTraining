@@ -177,6 +177,11 @@ class Training extends PluginBase {
                     TextFormat::YELLOW.TextFormat::BOLD."Bridger".TextFormat::EOL.TextFormat::WHITE."Practice your building skills",
                     "Bridger"
                 )),
+
+            (new Minigame("Hit Block Clutch"))
+                ->setGroup("MLG-Training")
+                ->setReleased(false)
+                ->setBeta(true),
         );
     }
 

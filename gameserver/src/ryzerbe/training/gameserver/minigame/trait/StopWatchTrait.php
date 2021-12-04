@@ -52,9 +52,13 @@ trait StopWatchTrait {
         return $this->topScore[$identifier] ?? 0.0;
     }
 
-    public function resetTimer(string $identifier = "default"): void {
+    public function resetTimer(string $identifier = "default", bool $score = false): void {
         unset($this->startTime[$identifier]);
         unset($this->stopTime[$identifier]);
         unset($this->running[$identifier]);
+        if($score){
+            unset($this->score[$identifier]);
+            unset($this->topScore[$identifier]);
+        }
     }
 }

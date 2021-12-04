@@ -3,13 +3,9 @@
 namespace ryzerbe\training\gameserver\minigame;
 
 use mysqli;
-use pocketmine\level\Level;
 use pocketmine\Player;
 use ryzerbe\core\util\async\AsyncExecutor;
-use ryzerbe\training\gameserver\game\map\Map;
 use ryzerbe\training\gameserver\session\Session;
-use function array_merge;
-use function method_exists;
 use function time;
 
 class MinigameSessionManager {
@@ -46,21 +42,7 @@ class MinigameSessionManager {
         unset($this->sessions[$session->getUniqueId()]);
 
         $minigame = $this->getMinigame();
-        $level = null;
-        if(method_exists($session, "getMap")) {
-            /** @var Map $map */
-            $map = $session->getMap();
-            $level = $map->getLevel();
-        } elseif(method_exists($minigame, "getLevel")) {
-            /** @var Level|null $level */
-            $level = $minigame->getLevel();
-        }
-        $players = [];
-        foreach($session->getOnlinePlayers() as $player) $players[$player->getName()] = $player;
-        if($level !== null) foreach($level->getPlayers() as $player){
-            $players[$player->getName()] = $player;
-        }
-        foreach($players as $player) {
+        foreach($session->getOnlinePlayers() as $player) {
             $player->getServer()->dispatchCommand($player, "leave");
         }
         $minigame->onUnload($session);
