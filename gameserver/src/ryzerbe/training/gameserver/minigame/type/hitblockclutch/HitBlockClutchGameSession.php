@@ -104,7 +104,7 @@ class HitBlockClutchGameSession extends GameSession {
         $map = $this->getMap();
         for($module = 1; $module <= HitBlockClutchMap::TOTAL_MODULES; $module++) {
             foreach($map->getEnemyPositions($module) as $vector3) {
-                $entity = new HitBlockClutchEntity(Location::fromObject($vector3, $this->getLevel(), 180), $this->getSession()->getPlayer()->getSkin(), $this, $module);
+                $entity = new HitBlockClutchEntity(Location::fromObject($vector3, $this->getLevel(), 0, 0), $this->getSession()->getPlayer()->getSkin(), $this, $module);
                 $entity->spawnToAll();
             }
         }

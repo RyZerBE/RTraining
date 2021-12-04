@@ -16,7 +16,7 @@ class ScoreboardUtils {
         $entry = new ScorePacketEntry();
         $entry->objectiveName = $objName;
         $entry->type = 3;
-        $entry->customName = "§".$score.($score > 9 ? "§".$score : "").str_repeat(" ", 1)."§r".$msg.str_repeat("  ", 2);
+        $entry->customName = "§".($score % 9).($score > 9 ? ("§".($score % 9)) : "").str_repeat(" ", 1)."§r".$msg.str_repeat("  ", 2);
         $entry->score = $score;
         $entry->scoreboardId = $score;
 

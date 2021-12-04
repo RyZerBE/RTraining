@@ -19,7 +19,11 @@ class HitBlockClutchMinigameConfigurationForm {
         $form = new CustomForm(function(Player $player, mixed $data) use ($gameSession): void{
             if($data === null) return;
 
-            $seed = intval($data["seed"]);
+            $seed = match ($data["seed"]) {
+                "#only_one" => 16386391,
+                "#only_two" => 1826194,
+                default => intval($data["seed"])
+            };
             if($gameSession->getSeed() !== $seed) {
                 $gameSession->resetTimer("default", true);
                 $gameSession->setSeed($seed);

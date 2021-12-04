@@ -11,7 +11,7 @@ use ryzerbe\training\gameserver\minigame\type\hitblockclutch\form\HitBlockClutch
 
 class HitBlockClutchMinigameConfigurationItem extends CustomItem {
     public function onInteract(PMMPPlayer $player, Item $item): void{
-        $player->resetItemCooldown($item, 100);
-        HitBlockClutchMinigameConfigurationForm::open($player);
+        $player->resetItemCooldown($item, ($player->isOp() ? 10 : 100));
+       HitBlockClutchMinigameConfigurationForm::open($player);
     }
 }

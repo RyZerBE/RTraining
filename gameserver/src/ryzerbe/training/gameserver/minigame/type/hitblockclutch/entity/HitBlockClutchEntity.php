@@ -14,6 +14,7 @@ use pocketmine\level\format\Chunk;
 use pocketmine\level\Location;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\type\hitblockclutch\HitBlockClutchGameSession;
 use function spl_object_id;
@@ -28,6 +29,10 @@ class HitBlockClutchEntity extends Human implements ChunkLoader {
         $this->module = $module;
         parent::__construct($location->getLevel(), Entity::createBaseNBT($location));
         $this->getLevel()->registerChunkLoader($this, $this->getFloorX() >> 4, $this->getFloorZ() >> 4, true);
+
+        $this->setNameTag(TextFormat::GRAY.TextFormat::BOLD."Hit Block Clutch\n".TextFormat::AQUA."Ry".TextFormat::WHITE."Z".TextFormat::AQUA."er".TextFormat::WHITE."BE");
+        $this->setNameTagAlwaysVisible();
+        $this->teleport($this, 180, 0);
     }
 
     /**
@@ -42,7 +47,7 @@ class HitBlockClutchEntity extends Human implements ChunkLoader {
     }
 
     public function onUpdate(int $currentTick): bool{
-        return false;
+        return $this->entityBaseTick();
     }
 
     public function attack(EntityDamageEvent $source): void{

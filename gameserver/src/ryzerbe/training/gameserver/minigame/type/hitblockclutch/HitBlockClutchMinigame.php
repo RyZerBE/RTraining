@@ -7,14 +7,12 @@ namespace ryzerbe\training\gameserver\minigame\type\hitblockclutch;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\level\generator\GeneratorManager;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
@@ -111,29 +109,22 @@ class HitBlockClutchMinigame extends Minigame {
         return true;
     }
 
-    public function onDamage(EntityDamageEvent $event): void{
-        if($event->getCause() === EntityDamageEvent::CAUSE_VOID) {
-            $entity = $event->getEntity();
-            if(!$entity instanceof Player) return;
-            $gameSession = SessionManager::getInstance()->getSessionOfPlayer($entity)?->getGameSession();
-            if(!$gameSession instanceof HitBlockClutchGameSession) return;
-            $event->setCancelled();
-
-            $entity->teleport($gameSession->getSpawn());
-
-            if($gameSession->isTimerRunning()){
-                $gameSession->stopTimer();
-                $gameSession->resetGame();
-            }
-        }
-    }
-
     public function onPlayerMove(PlayerMoveEvent $event): void {
         /** @var PMMPPlayer $player */
         $player = $event->getPlayer();
         $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
         if(!$gameSession instanceof HitBlockClutchGameSession) return;
-        if(!$player->isOnGround()) return;
+        if(!$player->isOnGround()){
+            if($player->y <= 20) {
+                if($gameSession->isTimerRunning()){
+                    $gameSession->stopTimer();
+                    $gameSession->resetGame();
+                } else {
+                    $player->teleport($gameSession->getSpawn());
+                }
+            }
+            return;
+        }
 
         $level = $player->getLevel();
         $block = $level->getBlock($player);
