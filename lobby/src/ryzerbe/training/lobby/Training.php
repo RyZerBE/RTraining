@@ -154,12 +154,6 @@ class Training extends PluginBase {
                     "MLG-Training"
                 )),
 
-            (new Minigame("Random MLG"))
-                ->setGroup("MLG-Training")
-                ->setReleased(false)
-                ->setBeta(true)
-                ->setTeaser(true),
-
             (new Minigame("Aim Trainer"))
                 ->setGroup("Aim-Trainer")
                 ->setNpcSettings(new NPCSettings(
@@ -180,6 +174,14 @@ class Training extends PluginBase {
 
             (new Minigame("Hit Block Clutch"))
                 ->setGroup("MLG-Training")
+
+            /*
+            (new Minigame("Random MLG"))
+                ->setGroup("MLG-Training")
+                ->setReleased(false)
+                ->setBeta(true)
+                ->setTeaser(true),
+             */
         );
     }
 
