@@ -180,8 +180,6 @@ class Training extends PluginBase {
 
             (new Minigame("Hit Block Clutch"))
                 ->setGroup("MLG-Training")
-                ->setReleased(false)
-                ->setBeta(true),
         );
     }
 
