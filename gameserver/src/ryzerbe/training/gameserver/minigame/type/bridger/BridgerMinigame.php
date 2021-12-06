@@ -33,7 +33,7 @@ class BridgerMinigame extends Minigame {
     public const BASE_Y = 50;
 
     public const DISTANCE_LIST = [
-        "8" => 8,
+        //"8" => 8,
         "16" => 16,
         "32" => 32,
         "64" => 64,
@@ -143,7 +143,7 @@ class BridgerMinigame extends Minigame {
             $this->scheduleUpdate($gameSession->getSession());
             $gameSession->startTimer($gameSession->__getRotation());
         }
-        $gameSession->setY($block->getFloorY());
+        //$gameSession->setY($block->getFloorY());
         $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $block->getPickedItem()->setCount(64));
     }
 

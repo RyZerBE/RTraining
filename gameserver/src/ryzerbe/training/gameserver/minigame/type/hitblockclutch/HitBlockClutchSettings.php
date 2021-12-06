@@ -11,4 +11,5 @@ class HitBlockClutchSettings extends MinigameSettings {
     public string $PREFIX = TextFormat::DARK_AQUA.TextFormat::BOLD."HitBlockClutch ".TextFormat::RESET;
 
     public bool $canPlace = true;
+    public int $deathHeight = 20;
 }

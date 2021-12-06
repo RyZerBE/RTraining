@@ -33,7 +33,7 @@ class BridgerGameSession extends GameSession {
     private string $__rotation = "";
     private int $rotation = 0;
     private int $gradient = 0;
-    private int $distance = 8;
+    private int $distance = 16;
 
     public function __construct(Session $session, Level $level, int $platformId){
         $this->platformId = $platformId;

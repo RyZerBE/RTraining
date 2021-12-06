@@ -2,10 +2,6 @@
 
 namespace ryzerbe\training\lobby;
 
-use BauboLP\Cloud\CloudBridge;
-use BauboLP\Cloud\Packets\MatchPacket;
-use jojoe77777\FormAPI\CustomForm;
-use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Skin;
@@ -19,13 +15,16 @@ use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
-use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\util\ItemUtils;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
 use ryzerbe\training\lobby\command\BetaCommand;
 use ryzerbe\training\lobby\entity\NPCEntity;
+use ryzerbe\training\lobby\form\type\ConfigurationOverviewForm;
 use ryzerbe\training\lobby\form\type\minigame\KitPvPSettingsForm;
 use ryzerbe\training\lobby\form\type\minigame\MLGRushSettingsForm;
+use ryzerbe\training\lobby\form\type\TournamentHostOverviewForm;
+use ryzerbe\training\lobby\form\type\TournamentMemberOverviewForm;
+use ryzerbe\training\lobby\form\type\TournamentOverviewForm;
 use ryzerbe\training\lobby\item\TrainingItemManager;
 use ryzerbe\training\lobby\kit\EnchantCommand;
 use ryzerbe\training\lobby\kit\KitCommand;
@@ -33,12 +32,11 @@ use ryzerbe\training\lobby\kit\KitManager;
 use ryzerbe\training\lobby\minigame\Minigame;
 use ryzerbe\training\lobby\minigame\MinigameManager;
 use ryzerbe\training\lobby\minigame\setting\NPCSettings;
-use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\scheduler\TrainingTask;
+use ryzerbe\training\lobby\tournament\TournamentManager;
 use ryzerbe\training\lobby\util\LevelSettings;
 use ryzerbe\training\lobby\util\SkinUtils;
 use function file_get_contents;
-use function json_encode;
 use function uniqid;
 
 class Training extends PluginBase {
@@ -198,12 +196,16 @@ class Training extends PluginBase {
         );
         $closure = function(Player $player, NPCEntity $entity): void {
             if(!$player->isOp()) return;
-            $pk = new MatchPacket();
-            $pk->addData("group", "Training");
-            $pk->addData("minigame", "MLGRush");
-            $pk->addData("tournament", "1");
-            $pk->addData("players", json_encode([$player->getName()]));
-            CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+            $tournament = TournamentManager::getTournamentByPlayer($player);
+            if($tournament !== null) {
+                if($tournament->isHost($player)) {
+                    TournamentHostOverviewForm::open($player, $tournament);
+                    return;
+                }
+                TournamentMemberOverviewForm::open($player, $tournament);
+                return;
+            }
+            TournamentOverviewForm::open($player);
         };
         $npcEntity = new NPCEntity(new Location(1.5, 117, -49.5, 0, 0, $level), $tournamentQueueSkin);
         $npcEntity->updateTitle(TextFormat::BLUE.TextFormat::BOLD."Tournament", TextFormat::WHITE."Soon");
@@ -226,42 +228,7 @@ class Training extends PluginBase {
         $npcEntity = new NPCEntity(new Location(2.5, 114, -5.5, 0, 0, $level), $skin);
         $npcEntity->updateTitle(TextFormat::AQUA."Configurations", TextFormat::WHITE."Click to configure");
         $closure = function(Player $player, NPCEntity $entity): void{
-            $form = new SimpleForm(function(Player $player, $data): void{
-                if($data === null) return;
-
-                $trainingPlayer = TrainingPlayerManager::getPlayer($player);
-                if($trainingPlayer === null) return;
-
-                switch($data) {
-                    case "Lobby": {
-                        $form = new CustomForm(function(Player $player, $data) use ($trainingPlayer): void{
-                            if($data === null) return;
-                            $trainingPlayer->getPlayerSettings()->setTeamRequests($data["team_requests"]);
-                            $trainingPlayer->getPlayerSettings()->setChallengeRequests($data["match_requests"]);
-                            $player->playSound("random.levelup", 5.0, 1.0, [$player]);
-                        });
-                        $form->addToggle(LanguageProvider::getMessageContainer("training-team-request-setting", $player->getName()), $trainingPlayer->getPlayerSettings()->allowTeamRequests(), "team_requests");
-                        $form->addToggle(LanguageProvider::getMessageContainer("training-match-request-setting", $player->getName()), $trainingPlayer->getPlayerSettings()->allowTeamRequests(), "match_requests");
-                        $form->sendToPlayer($player);
-                        break;
-                    }
-                    default: {
-                        $minigame = MinigameManager::getInstance()->getMinigame($data);
-                        if($minigame === null) break;
-                        ($minigame->getSettings())($player);
-                        break;
-                    }
-                }
-            });
-            $form->setContent(LanguageProvider::getMessageContainer("training-configuration-select-game", $player->getName()));
-            $form->setTitle(TextFormat::AQUA.TextFormat::BOLD."Settings");
-            $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::YELLOW.TextFormat::BOLD." Lobby", -1, "", "Lobby");
-            foreach(MinigameManager::getInstance()->getMinigames() as $minigame) {
-                $settings = $minigame->getSettings();
-                if($settings === null) continue;
-                $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::BLUE.TextFormat::BOLD." ".$minigame->getName(), -1, "", $minigame->getName());
-            }
-            $form->sendToPlayer($player);
+            ConfigurationOverviewForm::open($player);
         };
         $npcEntity->setInteractClosure($closure);
         $npcEntity->setAttackClosure($closure);

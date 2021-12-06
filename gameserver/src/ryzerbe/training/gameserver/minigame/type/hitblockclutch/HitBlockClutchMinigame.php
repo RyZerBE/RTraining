@@ -7,12 +7,14 @@ namespace ryzerbe\training\gameserver\minigame\type\hitblockclutch;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\level\generator\GeneratorManager;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
@@ -97,6 +99,11 @@ class HitBlockClutchMinigame extends Minigame {
         /** @var HitBlockClutchGameSession $gameSession */
         $gameSession = $session->getGameSession();
         $gameSession->resetAllBlocks();
+
+        $id = $gameSession->getPlatformId();
+        foreach(array_filter($gameSession->getLevel()->getEntities(), function(Entity $entity) use ($id): bool {
+            return $entity instanceof HitBlockClutchEntity && $entity->getGameSession()->getPlatformId() === $id;
+        }) as $entity) $entity->flagForDespawn();
     }
 
     public function onUpdate(Session $session, int $currentTick): bool{
@@ -109,23 +116,27 @@ class HitBlockClutchMinigame extends Minigame {
         return true;
     }
 
+    public function onEntityDamage(EntityDamageEvent $event): void{
+        if($event->getCause() === EntityDamageEvent::CAUSE_VOID) {
+            $event->setCancelled();
+            $player = $event->getEntity();
+            if(!$player instanceof Player) return;
+            $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
+            if(!$gameSession instanceof HitBlockClutchGameSession) return;
+            if($gameSession->isTimerRunning()){
+                $gameSession->stopTimer();
+                $gameSession->resetGame();
+            } else {
+                $player->teleport($gameSession->getSpawn());
+            }
+        }
+    }
+
     public function onPlayerMove(PlayerMoveEvent $event): void {
         /** @var PMMPPlayer $player */
         $player = $event->getPlayer();
         $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
-        if(!$gameSession instanceof HitBlockClutchGameSession) return;
-        if(!$player->isOnGround()){
-            if($player->y <= 20) {
-                if($gameSession->isTimerRunning()){
-                    $gameSession->stopTimer();
-                    $gameSession->resetGame();
-                } else {
-                    $player->teleport($gameSession->getSpawn());
-                }
-            }
-            return;
-        }
-
+        if(!$gameSession instanceof HitBlockClutchGameSession || !$player->isOnGround()) return;
         $level = $player->getLevel();
         $block = $level->getBlock($player);
         $blockSideDown = $block->getSide(Vector3::SIDE_DOWN);

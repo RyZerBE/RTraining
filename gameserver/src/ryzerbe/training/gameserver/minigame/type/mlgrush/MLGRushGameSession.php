@@ -130,10 +130,11 @@ class MLGRushGameSession extends GameSession {
     }
 
     public function validateVoting(): void {
-        $this->setMaxPoints(array_key_first($this->getVoting()["points"]));
-        $this->setInfiniteBlocks(boolval(array_key_first($this->sortVoting($this->getVoting()["infiniteBlocks"]))));
-        $this->setWallsEnabled(boolval(array_key_first($this->sortVoting($this->getVoting()["wallsEnabled"]))));
-        $this->setRushProtection(boolval(array_key_first($this->sortVoting($this->getVoting()["rushProtection"]))));
+        $this->setMaxPoints(array_key_first($this->getVoting()["points"] ?? 5));
+        $this->setInfiniteBlocks(boolval(array_key_first($this->sortVoting($this->getVoting()["infiniteBlocks"] ?? false))));
+        //$this->setWallsEnabled(boolval(array_key_first($this->sortVoting($this->getVoting()["wallsEnabled"] ?? false))));
+        $this->setWallsEnabled(false);
+        $this->setRushProtection(boolval(array_key_first($this->sortVoting($this->getVoting()["rushProtection"] ?? false))));
     }
 
     private function sortVoting(array $voting): array {
@@ -169,7 +170,9 @@ class MLGRushGameSession extends GameSession {
         $player->resetFallDistance();
         $this->loadInventory($player, $minigame->getName(), null, null);
 
-        $location = $map->getGameMap()->getTeamLocation($session->getTeamByPlayer($player)?->getId(), $level)->asLocation();
+        $location = $map->getGameMap()->getTeamLocation($session->getTeamByPlayer($player)?->getId(), $level);
+        if(!$location->isValid()) return;
+        $location = $location->asLocation();
         while(($level->getBlock($location)->isSolid() || $level->getBlock($location->add(0, 1))->isSolid()) && $location->y < Level::Y_MAX) $location->y++;
         $player->teleport($location);
     }

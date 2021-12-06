@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ryzerbe\training\gameserver\session;
 
 use Exception;
+use pocketmine\level\Position;
 use ryzerbe\core\util\animation\AnimationManager;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\map\Map;
@@ -34,14 +35,15 @@ class TournamentSession extends Session {
 
         $this->map = $map = new Map(null, null);
         $map->load(function() use ($map): void {
-            $spawn = $map->getLevel()->getSafeSpawn()->add(0.5, 1, 0.5);
+            $level = $map->getLevel();
+            $spawn = Position::fromObject($level->getSafeSpawn()->add(0.5, 1, 0.5), $level);
             foreach($this->getOnlinePlayers() as $player) {
                 $player->teleport($spawn, 180, 0);
                 $player->setImmobile(false);
 
                 AnimationManager::getInstance()->addActiveAnimation(new DisplayEnemyAnimation($player, $this, $player->getName()));
             }
-            $map->getLevel()->setTime(1000);
+            $level->setTime(1000);
             $this->setRunning(true);
 
         }, "TournamentLobby");

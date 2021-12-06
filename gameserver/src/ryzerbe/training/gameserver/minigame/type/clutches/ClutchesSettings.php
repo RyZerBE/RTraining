@@ -28,4 +28,6 @@ class ClutchesSettings extends MinigameSettings {
     public int $hit = self::ONE_HIT;
     public float $knockBackLevel = self::EASY;
     public string $PREFIX = TextFormat::RED.TextFormat::BOLD."Clutches ".TextFormat::RESET;
+
+    public int $deathHeight = 15;
 }

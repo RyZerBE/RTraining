@@ -8,6 +8,7 @@ use ryzerbe\training\lobby\gamezone\GameZoneManager;
 use ryzerbe\training\lobby\inventory\InventorySortManager;
 use ryzerbe\training\lobby\player\TrainingPlayerManager;
 use ryzerbe\training\lobby\queue\QueueManager;
+use ryzerbe\training\lobby\tournament\TournamentManager;
 
 class PlayerQuitListener implements Listener {
 
@@ -25,6 +26,12 @@ class PlayerQuitListener implements Listener {
         $trainingPlayer->getTeam()?->leave($trainingPlayer);
         GameZoneManager::getInstance()->removePlayer($player);
         TrainingPlayerManager::removePlayer($player);
+
+        $tournament = TournamentManager::getTournamentByPlayer($player);
+        $tournament?->removePlayer($player);//TODO: Message or idk
+        foreach(TournamentManager::getTournamentInvitesByPlayer($player) as $tournament) {
+            $tournament->removeInvitedPlayer($player);
+        }
 
         $session = InventorySortManager::getInstance()->getSession($player);
         if($session !== null) {

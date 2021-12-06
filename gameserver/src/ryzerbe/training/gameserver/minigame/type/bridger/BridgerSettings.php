@@ -9,4 +9,5 @@ class BridgerSettings extends MinigameSettings {
     public string $PREFIX = TextFormat::YELLOW.TextFormat::BOLD."Bridger ".TextFormat::RESET;
     public bool $canPlace = true;
     public bool $inventoryTransactions = true;
+    public int $deathHeight = 30;
 }

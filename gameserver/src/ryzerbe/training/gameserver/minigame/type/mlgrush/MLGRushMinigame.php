@@ -286,7 +286,7 @@ class MLGRushMinigame extends Minigame {
             $player->getInventory()->setItemInHand($event->getItem()->setCount(64));
         }
         if($gameSession->isWallsEnabled()) {
-            if(!$gameSession->getMapBoundingBox()->isVectorInXZ($block)) {
+            if(!$gameSession->getMapBoundingBox()?->isVectorInXZ($block)) {
                 $event->setCancelled();
             }
         }

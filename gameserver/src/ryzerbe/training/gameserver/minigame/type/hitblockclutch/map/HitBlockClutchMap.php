@@ -40,7 +40,7 @@ class HitBlockClutchMap {
         $tempVector3->z = 10;
 
         for($module = 1; $module <= self::TOTAL_MODULES; $module++) {
-            $nextMinMax = $random->nextRange(6, 10);
+            $nextMinMax = $random->nextRange(4, 6);
             for($i = 1; $i <= $nextMinMax; $i++) {
                 $tempVector3->z++;
                 $gameSession->placeBlock($tempVector3, Block::get(BlockIds::IRON_BLOCK));
@@ -52,6 +52,10 @@ class HitBlockClutchMap {
             $tempVector3->y += $random->nextRange(6, 10);
 
             $nextMinMax = $random->nextRange(3, 7);
+            for($i = 1; $i <= 7; $i++) {
+                $gameSession->placeBlock($tempVector3->add(0, $i, -1), Block::get(BlockIds::INVISIBLE_BEDROCK));
+            }
+
             for($i = 1; $i <= $nextMinMax; $i++) {
                 $gameSession->placeBlock($tempVector3, Block::get(BlockIds::IRON_BLOCK));
                 $tempVector3->z++;
