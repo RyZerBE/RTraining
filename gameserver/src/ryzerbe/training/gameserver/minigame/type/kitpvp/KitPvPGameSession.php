@@ -10,6 +10,7 @@ use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\team\Team;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
 use ryzerbe\training\gameserver\minigame\trait\InventorySortTrait;
+use ryzerbe\training\gameserver\minigame\trait\MapManagerTrait;
 use ryzerbe\training\gameserver\minigame\trait\StatesTrait;
 use ryzerbe\training\gameserver\minigame\trait\TeamEloTrait;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\kits\Kit;
@@ -27,6 +28,7 @@ class KitPvPGameSession extends GameSession {
     use StatesTrait;
     use TeamEloTrait;
     use InventorySortTrait;
+    use MapManagerTrait;
 
     private ?Countdown $countdown;
     public int $tick = 0;
@@ -152,5 +154,9 @@ class KitPvPGameSession extends GameSession {
             ScoreboardUtils::setScoreboardEntry($player, 6, "", "training");
             ScoreboardUtils::setScoreboardEntry($player, 7, TextFormat::WHITE."⇨ ".TextFormat::AQUA."ryzer.be", "training");
         }
+    }
+
+    public function loadMaps(): void{
+        $this->mapPool = $this->getSession()->getMinigame()->getMapPool();
     }
 }

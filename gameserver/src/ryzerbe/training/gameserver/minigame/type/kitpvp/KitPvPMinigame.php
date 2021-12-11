@@ -59,8 +59,8 @@ class KitPvPMinigame extends Minigame {
                 if($countdown->getState() === Countdown::START) {
                     $gameSession->setRunning(true);
                     $gameSession->stopCountdown();
-                    $gameMap = $this->getMap()->getGameMap();
-                    $level = $this->getMap()->getLevel();
+                    $gameMap = $gameSession->getMap()->getGameMap();
+                    $level = $gameSession->getMap()->getLevel();
                     foreach($session->getTeams() as $team) {
                         $location = $gameMap->getTeamLocation($team->getId(), $level);
                         if($location === null) continue;
@@ -114,10 +114,10 @@ class KitPvPMinigame extends Minigame {
             $player->setImmobile(true);
         }
 
-        $map = $this->getMap();
+        $map = $gameSession->getMap();
         $map->load(function() use ($map, $session, $gameSession): void {
             $gameMap = $map->getGameMap();
-            $level = $this->getMap()->getLevel();
+            $level = $gameSession->getMap()->getLevel();
             $session->getGameSession()->setLevel($level);
             foreach($session->getTeams() as $team) {
                 $location = $gameMap->getTeamLocation($team->getId(), $level);
@@ -144,7 +144,7 @@ class KitPvPMinigame extends Minigame {
     }
 
     public function onUnload(Session $session): void{
-        $this->getMap()->unload();
+        $session->getGameSession()->getMap()->unload();
     }
 
     public function onPlayerDeath(PlayerDeathEvent $event): void {

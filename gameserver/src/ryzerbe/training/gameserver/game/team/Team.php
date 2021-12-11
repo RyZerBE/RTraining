@@ -104,6 +104,14 @@ class Team {
         };
     }
 
+    public function getSimilarColors(): array {
+        return match ($this->getBlockMeta()) {//THIS IS BULLSHIT
+            14 => ["Rot"],
+            11 => ["Magenta", "Light Blue", "Pink", "Purple", "Blue"],
+            default => ["White"],
+        };
+    }
+
     public static function getTeamNameByBlocKMeta(int $blockMeta): string {
         return match ($blockMeta) {
             14 => "Rot",

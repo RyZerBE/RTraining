@@ -3,6 +3,7 @@
 namespace ryzerbe\training\gameserver\minigame\type\mlgrush;
 
 use pocketmine\block\BlockIds;
+use pocketmine\block\utils\ColorBlockMetaHelper;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\player\PlayerDeathEvent;
@@ -26,6 +27,7 @@ use ryzerbe\training\gameserver\util\Countdown;
 use ryzerbe\training\gameserver\util\Logger;
 use function count;
 use function implode;
+use function in_array;
 
 class MLGRushMinigame extends Minigame {
     use MapManagerTrait;
@@ -77,8 +79,9 @@ class MLGRushMinigame extends Minigame {
     }
 
     public function constructGameSession(Session $session): GameSession{
-        $this->setMap(new Map($this->getRandomMap(), $session));
-        return new MLGRushGameSession($session, null);
+        $gameSession = new MLGRushGameSession($session, null);
+        $gameSession->setMap(new Map($this->getRandomMap(), $session));
+        return $gameSession;
     }
 
     public function onUpdate(Session $session, int $currentTick): bool{
@@ -140,8 +143,8 @@ class MLGRushMinigame extends Minigame {
                 switch($countdown->getState()) {
                     case Countdown::START: {
                         $gameSession->stopCountdown();
-                        $gameMap = $this->getMap()->getGameMap();
-                        $level = $this->getMap()->getLevel();
+                        $gameMap = $gameSession->getMap()->getGameMap();
+                        $level = $gameSession->getMap()->getLevel();
 
                         if($gameSession->isRushProtection()) {
                             $gameSession->hideBeds();
@@ -213,10 +216,10 @@ class MLGRushMinigame extends Minigame {
             $gameSession->setInfiniteBlocks(false);
         }
 
-        $map = $this->getMap();
+        $map = $gameSession->getMap();
         $map->load(function() use ($map, $session, $gameSession, $elo): void {
             $gameMap = $map->getGameMap();
-            $level = $this->getMap()->getLevel();
+            $level = $gameSession->getMap()->getLevel();
             $session->getGameSession()->setLevel($level);
             foreach($session->getTeams() as $team) {
                 $location = $gameMap->getTeamLocation($team->getId(), $level);
@@ -248,7 +251,7 @@ class MLGRushMinigame extends Minigame {
     }
 
     public function onUnload(Session $session): void{
-        $this->getMap()->unload();
+        $session->getGameSession()->getMap()->unload();
     }
 
     public function onPlayerMove(PlayerMoveEvent $event): void {
@@ -313,7 +316,7 @@ class MLGRushMinigame extends Minigame {
             $tile = $player->getLevel()->getTile($block);
             if(!$tile instanceof Bed) return;
             $event->setCancelled();
-            if($team->getBlockMeta() === $tile->getColor()) {
+            if(in_array(ColorBlockMetaHelper::getColorFromMeta($tile->getColor()), $team->getSimilarColors())) {
                 $player->getLevel()->addParticle(new SmokeParticle($block->floor()->add(0.5, 0.5, 0.5)));
                 $player->playSound("note.bass", 5.0, 1.0, [$player]);
 

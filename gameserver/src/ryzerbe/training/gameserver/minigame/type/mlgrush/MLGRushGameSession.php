@@ -20,6 +20,7 @@ use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\team\Team;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
 use ryzerbe\training\gameserver\minigame\trait\InventorySortTrait;
+use ryzerbe\training\gameserver\minigame\trait\MapManagerTrait;
 use ryzerbe\training\gameserver\minigame\trait\StatesTrait;
 use ryzerbe\training\gameserver\minigame\trait\TeamEloTrait;
 use ryzerbe\training\gameserver\minigame\trait\TeamPointsTrait;
@@ -39,6 +40,7 @@ class MLGRushGameSession extends GameSession {
     use StatesTrait;
     use InventorySortTrait;
     use TeamEloTrait;
+    use MapManagerTrait;
 
     public const STATE_VOTING = 2;
 
@@ -335,5 +337,9 @@ class MLGRushGameSession extends GameSession {
             Tile::createTile(Tile::BED, $level, TileBed::createNBT($bedBlock[0]))->setColor($bedBlock[2]);
             Tile::createTile(Tile::BED, $level, TileBed::createNBT($bedBlock[1]))->setColor($bedBlock[2]);
         }
+    }
+
+    public function loadMaps(): void{
+        $this->mapPool = $this->getSession()->getMinigame()->getMapPool();
     }
 }

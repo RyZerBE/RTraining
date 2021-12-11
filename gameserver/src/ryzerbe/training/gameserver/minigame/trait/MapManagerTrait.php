@@ -28,7 +28,7 @@ trait MapManagerTrait {
     }
 
     public function getRandomMap(): GameMap {
-        return $this->mapPool[array_rand($this->mapPool)];
+        return clone $this->mapPool[array_rand($this->mapPool)];
     }
 
     abstract public function loadMaps(): void;
