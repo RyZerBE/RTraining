@@ -267,7 +267,7 @@ class MLGRushMinigame extends Minigame {
         }
 
         /** @var MLGRushMap $gameMap */
-        $gameMap = $this->map->getGameMap();
+        $gameMap = $gameSession->getMap()->getGameMap();
         if($player->getY() < $gameMap->getDeathHeight()) {
             $gameSession->resetPlayer($player);
         }
@@ -279,7 +279,7 @@ class MLGRushMinigame extends Minigame {
         $gameSession = $session?->getGameSession();
         if(!$gameSession instanceof MLGRushGameSession || !$gameSession->isRunning()) return;
         /** @var MLGRushMap $gameMap */
-        $gameMap = $this->map->getGameMap();
+        $gameMap = $gameSession->getMap()->getGameMap();
         $block = $event->getBlock();
         if($block->getY() > $gameMap->getBuildHeight() || $block->getY() < $gameMap->getDeathHeight()) {
             $event->setCancelled();
@@ -304,7 +304,7 @@ class MLGRushMinigame extends Minigame {
         $gameSession = $session?->getGameSession();
         if(!$gameSession instanceof MLGRushGameSession || !$gameSession->isRunning()) return;
         /** @var MLGRushMap $gameMap */
-        $gameMap = $this->map->getGameMap();
+        $gameMap = $gameSession->getMap()->getGameMap();
         $block = $event->getBlock();
         if($block->getY() > $gameMap->getBuildHeight()) {
             $event->setCancelled();

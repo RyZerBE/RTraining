@@ -164,7 +164,7 @@ class MLGRushGameSession extends GameSession {
         $session = $this->getSession();
         /** @var MLGRushMinigame $minigame */
         $minigame = $session->getMinigame();
-        $map = $minigame->getMap();
+        $map = $this->getMap();
         $level = $map->getLevel();
 
         $player->setHealth($player->getMaxHealth());
@@ -273,7 +273,7 @@ class MLGRushGameSession extends GameSession {
             }
             ScoreboardUtils::setScoreboardEntry($player, ++$line, "", "training");
             ScoreboardUtils::setScoreboardEntry($player, ++$line, TextFormat::GRAY."○ Map", "training");
-            ScoreboardUtils::setScoreboardEntry($player, ++$line, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$minigame->getMap()->getGameMap()->getMapName(), "training");
+            ScoreboardUtils::setScoreboardEntry($player, ++$line, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$this->getMap()->getGameMap()->getMapName(), "training");
             ScoreboardUtils::setScoreboardEntry($player, ++$line, "", "training");
             ScoreboardUtils::setScoreboardEntry($player, ++$line, TextFormat::WHITE."⇨ ".TextFormat::AQUA."ryzer.be", "training");
         }
@@ -289,7 +289,7 @@ class MLGRushGameSession extends GameSession {
     public function hideBeds(): void {
         /** @var MLGRushMinigame $minigame */
         $minigame = $this->getSession()->getMinigame();
-        $map = $minigame->getMap();
+        $map = $this->getMap();
         $level = $map->getLevel();
 
         $this->bedPlaceTime = $this->tick + 10;
@@ -324,7 +324,7 @@ class MLGRushGameSession extends GameSession {
     public function spawnBeds(): void {
         /** @var MLGRushMinigame $minigame */
         $minigame = $this->getSession()->getMinigame();
-        $map = $minigame->getMap();
+        $map = $this->getMap();
         $level = $map->getLevel();
 
         foreach($this->bedBlocks as $bedBlock) {

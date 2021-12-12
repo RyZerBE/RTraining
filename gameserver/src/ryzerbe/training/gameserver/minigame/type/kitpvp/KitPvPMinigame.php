@@ -114,6 +114,7 @@ class KitPvPMinigame extends Minigame {
             $player->setImmobile(true);
         }
 
+        $gameSession->setMap($this->getMap());
         $map = $gameSession->getMap();
         $map->load(function() use ($map, $session, $gameSession): void {
             $gameMap = $map->getGameMap();
