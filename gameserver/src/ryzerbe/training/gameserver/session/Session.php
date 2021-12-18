@@ -81,12 +81,20 @@ class Session {
     /**
      * @return Player[]
      */
-    public function getOnlinePlayers(): array {
+    public function getOnlinePlayers(bool $names = false): array {
         $players = [];
-        foreach($this->getPlayers() as $player) {
-            $player = Server::getInstance()->getPlayerExact($player);
-            if($player !== null) $players[] = $player;
+        if($names) {
+            foreach($this->getPlayers() as $player) {
+                $player = Server::getInstance()->getPlayerExact($player);
+                if($player !== null) $players[] = $player->getName();
+            }
+        }else {
+            foreach($this->getPlayers() as $player) {
+                $player = Server::getInstance()->getPlayerExact($player);
+                if($player !== null) $players[] = $player;
+            }
         }
+
         return $players;
     }
 
@@ -97,7 +105,12 @@ class Session {
     /**
      * @return Team[]
      */
-    public function getTeams(): array{
+    public function getTeams(bool $names = false): array{
+        $teams = [];
+        if($names) {
+            foreach($this->teams as $team) $teams[] = $team->getName();
+            return $teams;
+        }
         return $this->teams;
     }
 

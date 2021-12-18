@@ -2,10 +2,13 @@
 
 namespace ryzerbe\training\gameserver\scheduler;
 
+use BauboLP\Cloud\CloudBridge;
+use BauboLP\Cloud\Packets\MatchPacket;
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\util\TaskUtils;
 use ryzerbe\training\gameserver\game\match\MatchQueue;
 use ryzerbe\training\gameserver\game\spectate\SpectateQueue;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
@@ -15,6 +18,8 @@ use ryzerbe\training\gameserver\session\TournamentSession;
 use ryzerbe\training\gameserver\Training;
 use ryzerbe\training\gameserver\util\WaitingQueue;
 use function array_filter;
+use function implode;
+use function json_encode;
 use function str_repeat;
 use function time;
 
@@ -50,6 +55,24 @@ class TrainingUpdateTask extends Task {
                     $request->accept();
                 }
             }
+        }
+
+        if(($currentTick % TaskUtils::secondsToTicks(5)) === 0) {
+            $pk = new MatchPacket();
+            $matches = [];
+            foreach(SessionManager::getInstance()->getSessions() as $session) {
+                $gameSession = $session->getGameSession();
+                if($gameSession === null) continue;
+                if(isset($matches[$gameSession->getSession()->getUniqueId()])) continue;
+                $matches[$gameSession->getSession()->getUniqueId()] = [
+                    "teams" => $session->getTeams(true),
+                    "minigame" => $gameSession->getSession()->getMinigame()->getName(),
+                    "players" => $session->getOnlinePlayers(true)
+                ];
+            }
+            $pk->addData("matches", json_encode($matches));
+            $pk->addData("group", "TrainingLobby");
+            CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
         }
 
         if($currentTick % 20 !== 0) return;
