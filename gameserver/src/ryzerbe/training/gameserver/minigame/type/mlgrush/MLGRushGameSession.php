@@ -47,6 +47,7 @@ class MLGRushGameSession extends GameSession {
     private bool $infiniteBlocks = true;
     private bool $wallsEnabled = false;
     private bool $rushProtection = false;
+    private bool $damage = true;
     private int $maxPoints = PHP_INT_MAX;
 
     private ?AxisAlignedBB $mapBoundingBox = null;
@@ -104,6 +105,20 @@ class MLGRushGameSession extends GameSession {
         $this->rushProtection = $rushProtection;
     }
 
+    /**
+     * @param bool $damage
+     */
+    public function setDamageActivate(bool $damage): void{
+        $this->damage = $damage;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDamageActivated(): bool{
+        return $this->damage;
+    }
+
     public function getVotes(): int{
         return $this->votes;
     }
@@ -134,6 +149,7 @@ class MLGRushGameSession extends GameSession {
     public function validateVoting(): void {
         $this->setMaxPoints(array_key_first($this->getVoting()["points"] ?? 5));
         $this->setInfiniteBlocks(boolval(array_key_first($this->sortVoting($this->getVoting()["infiniteBlocks"] ?? false))));
+        $this->setDamageActivate(boolval(array_key_first($this->sortVoting($this->getVoting()["damage"] ?? false))));
         //$this->setWallsEnabled(boolval(array_key_first($this->sortVoting($this->getVoting()["wallsEnabled"] ?? false))));
         $this->setWallsEnabled(false);
         $this->setRushProtection(boolval(array_key_first($this->sortVoting($this->getVoting()["rushProtection"] ?? false))));

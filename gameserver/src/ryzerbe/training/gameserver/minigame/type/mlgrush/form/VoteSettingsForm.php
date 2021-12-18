@@ -32,6 +32,7 @@ class VoteSettingsForm {
             $gameSession->vote("infiniteBlocks", intval($data["infiniteBlocks"] ?? boolval(mt_rand(0, 1))));
             $gameSession->vote("wallsEnabled", intval($data["wallsEnabled"] ?? boolval(mt_rand(0, 1))));
             $gameSession->vote("rushProtection", intval($data["rushProtection"] ?? boolval(mt_rand(0, 1))));
+            $gameSession->vote("damage", intval($data["damage"] ?? boolval(mt_rand(0, 1))));
         });
         $form->setTitle(ClutchesMinigame::$PREFIX);
         $form->addStepSlider("§cPoints", array_map(function(string|int $value): string {
@@ -39,6 +40,7 @@ class VoteSettingsForm {
         }, array_keys(MLGRushMinigame::POINTS_LIST)), mt_rand(0, (count(MLGRushMinigame::POINTS_LIST) - 1)), "points");
         $form->addToggle("§cInfinite Blocks", boolval(mt_rand(0, 1)), "infiniteBlocks");
         $form->addToggle("§cRush Protection", boolval(mt_rand(0, 1)), "rushProtection");
+        $form->addToggle("§cDamage (pickaxe, falldamge ...)", boolval(mt_rand(0, 1)), "damage");
         //$form->addToggle("§cWalls", boolval(mt_rand(0, 1)), "wallsEnabled");
         $form->sendToPlayer($player);
     }

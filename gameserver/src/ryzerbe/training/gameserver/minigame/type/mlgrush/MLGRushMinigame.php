@@ -6,11 +6,13 @@ use pocketmine\block\BlockIds;
 use pocketmine\block\utils\ColorBlockMetaHelper;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\level\Location;
 use pocketmine\level\particle\SmokeParticle;
+use pocketmine\Player;
 use pocketmine\tile\Bed;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
@@ -176,6 +178,7 @@ class MLGRushMinigame extends Minigame {
                                     "Points ".TextFormat::GRAY."» ".($gameSession->getMaxPoints() >= PHP_INT_MAX ? TextFormat::RED."Endless" : TextFormat::GREEN.$gameSession->getMaxPoints()),
                                     "Infinite Blocks ".TextFormat::GRAY."» ".($gameSession->isInfiniteBlocks() ? TextFormat::GREEN."Enabled" : TextFormat::RED."Disabled"),
                                     "Rush Protection ".TextFormat::GRAY."» ".($gameSession->isRushProtection() ? TextFormat::GREEN."Enabled" : TextFormat::RED."Disabled"),
+                                    "Damage ".TextFormat::GRAY."» ".($gameSession->isDamageActivated() ? TextFormat::GREEN."Enabled" : TextFormat::RED."Disabled"),
                                 ]));
                         }
                         $gameSession->startCountdown(8, Countdown::START);
@@ -355,6 +358,27 @@ class MLGRushMinigame extends Minigame {
                     $inventory->addItem($item->setCustomName("§r§a".$item->getVanillaName()));
                 }
             }
+        }
+    }
+
+    public function onDamage(EntityDamageEvent $event){
+        $player = $event->getEntity();
+        $cause = $event->getCause();
+
+        if(!$player instanceof Player) return;
+        $session = SessionManager::getInstance()->getSessionOfPlayer($player);
+        $gameSession = $session?->getGameSession();
+        if(!$gameSession instanceof MLGRushGameSession) return;
+        if($gameSession->isDamageActivated()) return;
+
+        switch($cause) {
+            case EntityDamageEvent::CAUSE_SUFFOCATION:
+            case EntityDamageEvent::CAUSE_FALL:
+                $event->setCancelled();
+                break;
+            case EntityDamageEvent::CAUSE_ENTITY_ATTACK:
+                $player->setHealth(20.0);
+                break;
         }
     }
 
