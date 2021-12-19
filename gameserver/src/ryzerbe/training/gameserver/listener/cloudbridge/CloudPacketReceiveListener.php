@@ -13,9 +13,11 @@ use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\util\Logger;
 use function boolval;
 use function count;
+use function implode;
 use function in_array;
 use function intval;
 use function json_decode;
+use function var_dump;
 
 class CloudPacketReceiveListener implements Listener{
     public function onPacketReceive(CloudPacketReceiveEvent $event): void {
@@ -26,7 +28,9 @@ class CloudPacketReceiveListener implements Listener{
             if($players !== null) {
                 $spectate = $packet->getValue("spectate");
                 if($spectate !== null) {
+                    $players = (array) json_decode($players);
                     SpectateQueue::addRequest(new SpectateRequest($players, $spectate));
+                    var_dump("GOT Spectate request by ".implode(", ", $players));
                     return;
                 }
 

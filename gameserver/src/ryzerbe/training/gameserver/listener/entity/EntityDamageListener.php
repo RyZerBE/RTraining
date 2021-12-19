@@ -42,6 +42,10 @@ class EntityDamageListener implements Listener {
             if($event instanceof EntityDamageByEntityEvent) {
                 $damager = $event->getDamager();
                 if($damager instanceof Player) {
+                    if($damager->isSpectator()){
+                        $event->setCancelled();
+                        return;
+                    }
                     $damagerSession = SessionManager::getInstance()->getSessionOfPlayer($damager);
                     foreach($damagerSession->getTeams() as $team) {
                         if($team->isPlayer($damager) && $team->isPlayer($entity)) {

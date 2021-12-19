@@ -11,6 +11,7 @@ use ryzerbe\core\util\customitem\CustomItem;
 use ryzerbe\core\util\customitem\CustomItemManager;
 use ryzerbe\training\lobby\item\type\ChallengeItem;
 use ryzerbe\training\lobby\item\type\HubItem;
+use ryzerbe\training\lobby\item\type\SpectateItem;
 use ryzerbe\training\lobby\item\type\TeamItem;
 
 class TrainingItemManager {
@@ -27,6 +28,7 @@ class TrainingItemManager {
             new ChallengeItem(Item::get(ItemIds::IRON_SWORD)->setCustomName(TextFormat::GOLD."Challenger"), 4),
             new TeamItem(Item::get(ItemIds::SHIELD)->setCustomName(TextFormat::GOLD."Team manager"), 5),
             new HubItem(Item::get(ItemIds::IRON_DOOR)->setCustomName(TextFormat::RED."Go to hub"), 8),
+            new SpectateItem(Item::get(ItemIds::ENCHANTED_BOOK)->setCustomName(TextFormat::GREEN."Spectate"), 1)
         ];
 
         foreach($items as $item){

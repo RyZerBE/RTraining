@@ -16,9 +16,13 @@ class PlayerDropItemListener implements Listener {
     public function onPlayerDropItem(PlayerDropItemEvent $event): void {
         $player = $event->getPlayer();
         if(!$player instanceof Player) return;
+        if($player->isSpectator()) {
+            $event->setCancelled();
+            return;
+        }
         $minigame = MinigameManager::getMinigameByPlayer($player);
         if($minigame === null) {
-            $event->setCancelled();//TODO: Cancel event?
+            $event->setCancelled();
             return;
         }
         $event->setCancelled(!$minigame->getSettings()->itemDrop);

@@ -65,7 +65,7 @@ class TrainingUpdateTask extends Task {
                 if($gameSession === null) continue;
                 if(isset($matches[$gameSession->getSession()->getUniqueId()])) continue;
                 $matches[$gameSession->getSession()->getUniqueId()] = [
-                    "teams" => $session->getTeams(true),
+                    "teams" => ($gameSession->getSession()->getMinigame()->getSettings()->maxPlayers === 1) ? $gameSession->getSession()->getOnlinePlayers(true) : $session->getTeams(true),
                     "minigame" => $gameSession->getSession()->getMinigame()->getName(),
                     "players" => $session->getOnlinePlayers(true)
                 ];

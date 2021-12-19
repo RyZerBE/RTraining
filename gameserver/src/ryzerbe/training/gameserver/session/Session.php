@@ -105,10 +105,10 @@ class Session {
     /**
      * @return Team[]
      */
-    public function getTeams(bool $names = false): array{
+    public function getTeams(bool $names = false, bool $withColours = true): array{
         $teams = [];
         if($names) {
-            foreach($this->teams as $team) $teams[] = $team->getName();
+            foreach($this->teams as $team) $teams[] = ($withColours === true) ? $team->getColor().$team->getName() : $team->getName();
             return $teams;
         }
         return $this->teams;

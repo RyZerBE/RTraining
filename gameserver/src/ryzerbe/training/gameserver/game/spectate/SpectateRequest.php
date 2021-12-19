@@ -5,9 +5,13 @@ namespace ryzerbe\training\gameserver\game\spectate;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
 use pocketmine\Server;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\RyZerPlayerProvider;
+use ryzerbe\training\gameserver\Training;
+use ryzerbe\training\gameserver\util\WaitingQueue;
 use function implode;
 use function time;
+use function var_dump;
 
 class SpectateRequest {
     private array $playerNames;
@@ -54,13 +58,25 @@ class SpectateRequest {
         SpectateQueue::removeRequest($this);
 
         $target = Server::getInstance()->getPlayerExact($this->getTarget());
-        if($target === null) return;
+        if($target === null){
+            foreach($this->getPlayerNames() as $playerName){
+                $player = Server::getInstance()->getPlayerExact($playerName);
+                if($player === null) continue;
+                $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-match-not-found", $player->getName()));
+                CloudBridge::getCloudProvider()->dispatchProxyCommand($playerName, "leave");
+            }
+            return;
+        }
 
         foreach($this->getPlayerNames() as $playerName) {
             $player = Server::getInstance()->getPlayerExact($playerName);
             if($player === null) continue;
+            WaitingQueue::removePlayer($player);
+            $player->setImmobile(false);
             $player->setGamemode(3);
+            $player->removeAllEffects();
             $player->teleport($target);
+            $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer("training-match-found", $player->getName()));
         }
     }
 }
