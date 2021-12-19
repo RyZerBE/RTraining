@@ -100,11 +100,11 @@ class Challenge {
             $pk->addData("teams", json_encode([
                 "team_1" => [
                     "players" => [$opponentPlayer->getPlayer()->getName()],
-                    "data" => ["name" => "Team 1", "color" => "§b"]
+                    "data" => ["name" => $opponentPlayer->getPlayer()->getName(), "color" => "§b"]
                 ],
                 "team_2" => [
                     "players" => [$player->getName()],
-                    "data" => ["name" => "Team 2", "color" => "§c"]
+                    "data" => ["name" => $player->getName(), "color" => "§c"]
                 ]
             ]));
         }else if($this->getTeam() !== null && $trainingPlayer->getTeam() !== null) {
@@ -126,7 +126,7 @@ class Challenge {
                     "players" => $opponentPlayer->getTeam()->getPlayers(true),
                     "data" => ["name" => $opponentPlayer->getTeam()->getName(), "color" => "§c"]
                 ]
-            ])); //todo: team name configurable
+            ]));
         }else {
             $opponentPlayer->getPlayer()->sendMessage("ERROR WITH TEAM SHIT");
             $trainingPlayer->getPlayer()->sendMessage("ERROR WITH TEAM SHIT");
