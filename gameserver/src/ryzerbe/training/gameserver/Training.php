@@ -2,6 +2,7 @@
 
 namespace ryzerbe\training\gameserver;
 
+use BauboLP\Cloud\CloudBridge;
 use pocketmine\block\BlockFactory;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
@@ -51,6 +52,12 @@ class Training extends PluginBase {
         $this->getScheduler()->scheduleRepeatingTask(new TrainingUpdateTask(), 1);
 
         BlockFactory::registerBlock(new BedBlock(), true);
+    }
+
+    public function onDisable(){
+        foreach($this->getServer()->getOnlinePlayers() as $player) {
+            CloudBridge::getCloudProvider()->dispatchProxyCommand($player, "leave");
+        }
     }
 
     public static function getInstance(): Training{
