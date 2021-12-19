@@ -40,7 +40,7 @@ class VoteSettingsForm {
         }, array_keys(MLGRushMinigame::POINTS_LIST)), mt_rand(0, (count(MLGRushMinigame::POINTS_LIST) - 1)), "points");
         $form->addToggle("§cInfinite Blocks", boolval(mt_rand(0, 1)), "infiniteBlocks");
         $form->addToggle("§cRush Protection", boolval(mt_rand(0, 1)), "rushProtection");
-        $form->addToggle("§cDamage (pickaxe, falldamge ...)", boolval(mt_rand(0, 1)), "damage");
+        $form->addToggle("§cDamage (pickaxe, falldamage ...)", boolval(mt_rand(0, 1)), "damage");
         //$form->addToggle("§cWalls", boolval(mt_rand(0, 1)), "wallsEnabled");
         $form->sendToPlayer($player);
     }

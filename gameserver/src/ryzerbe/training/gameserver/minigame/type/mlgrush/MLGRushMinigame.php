@@ -118,7 +118,6 @@ class MLGRushMinigame extends Minigame {
                                 return true;
                             }
                             if($gameSession->getVotes() < ($playerCount / 2)) {
-                                //Waiting for 50% of the players to vote
                                 return true;
                             }
                             break;
