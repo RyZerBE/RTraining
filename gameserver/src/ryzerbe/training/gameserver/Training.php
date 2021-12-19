@@ -56,7 +56,7 @@ class Training extends PluginBase {
 
     public function onDisable(){
         foreach($this->getServer()->getOnlinePlayers() as $player) {
-            CloudBridge::getCloudProvider()->dispatchProxyCommand($player, "leave");
+            CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "leave");
         }
     }
 
