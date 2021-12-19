@@ -55,7 +55,7 @@ class SelectMinigameForm {
         $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Select Minigame");
         foreach(MinigameManager::getInstance()->getMinigames() as $minigame) {
             if(!$minigame->isMultiplayer()) continue;
-            $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::BLUE.TextFormat::BOLD." ".$minigame->getName(), -1, "", $minigame->getName());
+            $form->addButton(TextFormat::DARK_GRAY."⇨".TextFormat::GREEN.TextFormat::BOLD." ".$minigame->getName(), -1, "", $minigame->getName());
         }
         $form->sendToPlayer($player);
     }
