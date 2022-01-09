@@ -11,7 +11,6 @@ use ryzerbe\training\gameserver\Training;
 use ryzerbe\training\gameserver\util\WaitingQueue;
 use function implode;
 use function time;
-use function var_dump;
 
 class SpectateRequest {
     private array $playerNames;
@@ -71,6 +70,7 @@ class SpectateRequest {
         foreach($this->getPlayerNames() as $playerName) {
             $player = Server::getInstance()->getPlayerExact($playerName);
             if($player === null) continue;
+            SpectateManager::spectate($target, $player);
             WaitingQueue::removePlayer($player);
             $player->setImmobile(false);
             $player->setGamemode(3);

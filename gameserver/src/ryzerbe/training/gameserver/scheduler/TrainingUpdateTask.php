@@ -18,7 +18,6 @@ use ryzerbe\training\gameserver\session\TournamentSession;
 use ryzerbe\training\gameserver\Training;
 use ryzerbe\training\gameserver\util\WaitingQueue;
 use function array_filter;
-use function implode;
 use function json_encode;
 use function str_repeat;
 use function time;

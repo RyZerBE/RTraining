@@ -8,6 +8,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\utils\TextFormat;
 use ryzerbe\bedwars\Loader;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\training\gameserver\game\spectate\SpectateManager;
 use ryzerbe\training\gameserver\session\SessionManager;
 use ryzerbe\training\gameserver\session\TournamentSession;
 use ryzerbe\training\gameserver\Training;
@@ -17,6 +18,11 @@ class PlayerQuitListener implements Listener {
     public function onQuit(PlayerQuitEvent $event): void{
         $player = $event->getPlayer();
         $event->setQuitMessage("");
+
+        foreach(SpectateManager::getSpectators($player) as $spectator) {
+            $spectator->getServer()->dispatchCommand($spectator, "leave");
+        }
+        SpectateManager::remove($player);
 
         $session = SessionManager::getInstance()->getSessionOfPlayer($player);
         if($session !== null) {
