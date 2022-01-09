@@ -37,6 +37,7 @@ class KitPvPGameSession extends GameSession {
     public function __construct(Session $session, ?Level $level){
         parent::__construct($session, $level);
         $minigame = $session->getMinigame()->getName();
+
         foreach(KitManager::getInstance()->getKits() as $kit) {
             //TODO: Do not register the items every time
             $this->registerItems($minigame, $kit->getName(), $kit->getItems());

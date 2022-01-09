@@ -14,6 +14,7 @@ use function array_values;
 use function count;
 use function json_decode;
 use function strtolower;
+use function var_dump;
 
 trait InventorySortTrait {
     private array $items = [];
@@ -60,9 +61,12 @@ trait InventorySortTrait {
             if(!$player->isConnected()) return;
             $defaultItems = $this->getItems($minigame, $key);
             $items = [];
+            var_dump(1);
             if($result === null || empty($decode = @json_decode($result, true))) {
                 $items = $defaultItems;
+                var_dump(2);
             } else {
+                var_dump(2);
                 foreach($decode as $slot => $item) {
                     $item = $this->getItem($minigame, $item, $key);
                     if($item === null) continue;
@@ -71,6 +75,7 @@ trait InventorySortTrait {
             }
             if(count($defaultItems) !== count($items)) {
                 $items = $defaultItems;
+                var_dump(3);
             }
             $player->getInventory()->setContents($items);
             if($closure !== null) ($closure)();
