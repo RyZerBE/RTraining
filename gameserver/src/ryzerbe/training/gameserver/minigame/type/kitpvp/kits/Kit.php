@@ -8,8 +8,10 @@ class Kit {
 
     public function __construct(string $name, array $items, array $armor){
         $this->name = $name;
-        $this->items = $items;
         $this->armor = $armor;
+        foreach($items as $key => $item) {
+            $this->items[$item->getVanillaName()."_".$key] = $item;
+        }
     }
 
     public function getName(): string{

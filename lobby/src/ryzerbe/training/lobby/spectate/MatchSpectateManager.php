@@ -3,7 +3,6 @@
 namespace ryzerbe\training\lobby\spectate;
 
 use pocketmine\utils\SingletonTrait;
-use function array_search;
 
 class MatchSpectateManager {
     use SingletonTrait;
