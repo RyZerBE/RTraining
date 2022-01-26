@@ -35,6 +35,8 @@ class BridgerGameSession extends GameSession {
     private int $gradient = 0;
     private int $distance = 16;
 
+    private bool $heightAdjustments = false;
+
     public function __construct(Session $session, Level $level, int $platformId){
         $this->platformId = $platformId;
         $this->spawn = new Location(8.5 + ($platformId * 160), (BridgerMinigame::BASE_Y + 1), 8.5, 0, 0, $level);
@@ -69,6 +71,14 @@ class BridgerGameSession extends GameSession {
         return $this->y;
     }
 
+    public function isHeightAdjustments(): bool{
+        return $this->heightAdjustments;
+    }
+
+    public function setHeightAdjustments(bool $heightAdjustments): void{
+        $this->heightAdjustments = $heightAdjustments;
+    }
+
     public function setRotation(int $rotation): void{
         $this->rotation = $rotation;
         $this->__rotation = array_keys(BridgerMinigame::ROTATION_LIST)[$this->getRotation()] ?? "default";
@@ -84,7 +94,9 @@ class BridgerGameSession extends GameSession {
 
     public function setY(int $y): void{
         $oldY = $this->y;
-        $this->y = $y;
+        if($this->isHeightAdjustments()) {
+            $this->y = $y;
+        }
         if($oldY !== $y) $this->generateGoalPlatform();
     }
 

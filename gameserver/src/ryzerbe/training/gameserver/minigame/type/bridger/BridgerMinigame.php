@@ -143,7 +143,7 @@ class BridgerMinigame extends Minigame {
             $this->scheduleUpdate($gameSession->getSession());
             $gameSession->startTimer($gameSession->__getRotation());
         }
-        //$gameSession->setY($block->getFloorY());
+        $gameSession->setY($block->getFloorY());
         $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $block->getPickedItem()->setCount(64));
     }
 

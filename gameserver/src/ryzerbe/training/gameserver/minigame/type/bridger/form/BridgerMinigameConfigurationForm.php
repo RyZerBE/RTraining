@@ -31,6 +31,7 @@ class BridgerMinigameConfigurationForm {
             $gameSession->setRotation(array_values(BridgerMinigame::ROTATION_LIST)[$data["rotation"]]);
             $gameSession->setDistance(array_values(BridgerMinigame::DISTANCE_LIST)[$data["distance"]]);
             $gameSession->setGradient($data["gradient"] ?? 0);
+            $gameSession->setHeightAdjustments($data["heightAdjustment"] ?? false);
             $gameSession->generateGoalPlatform();
             $gameSession->sendScoreboard();
             $player->playSound("random.levelup", 5.0, 1.0, [$player]);
@@ -40,6 +41,7 @@ class BridgerMinigameConfigurationForm {
             return (string)$value;
         }, array_keys(BridgerMinigame::DISTANCE_LIST)), $distanceKey, "distance");
         $form->addDropdown("§cType", array_keys(BridgerMinigame::ROTATION_LIST), $typeKey, "rotation");
+        $form->addToggle("§cAutomatic height adjustment", $gameSession->isHeightAdjustments(), "heightAdjustment");
         if($player->isOp()) $form->addInput("§cGradient (Only OP)", "", "" . $gameSession->getGradient(), "gradient");
         $form->sendToPlayer($player);
     }
