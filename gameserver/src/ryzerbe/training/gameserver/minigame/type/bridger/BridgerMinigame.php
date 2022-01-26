@@ -126,6 +126,7 @@ class BridgerMinigame extends Minigame {
         if(!$gameSession->isTimerRunning($gameSession->__getRotation())) return false;
         $player = $session->getPlayer();
         if($player === null) return false;
+        if($gameSession->isPlatformUpdateScheduled()) $gameSession->generateGoalPlatform();
         $player->sendActionBarMessage("§l§6" . number_format($gameSession->getTimer($gameSession->__getRotation()), 2) . " Seconds..");
         return true;
     }
@@ -143,7 +144,7 @@ class BridgerMinigame extends Minigame {
             $this->scheduleUpdate($gameSession->getSession());
             $gameSession->startTimer($gameSession->__getRotation());
         }
-        $gameSession->setY($block->getFloorY());
+        $gameSession->setY($block->getFloorY(), false);
         $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $block->getPickedItem()->setCount(64));
     }
 

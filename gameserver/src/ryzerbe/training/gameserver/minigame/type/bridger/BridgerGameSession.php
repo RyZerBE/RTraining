@@ -36,6 +36,7 @@ class BridgerGameSession extends GameSession {
     private int $distance = 16;
 
     private bool $heightAdjustments = false;
+    private bool $platformUpdateScheduled = false;
 
     public function __construct(Session $session, Level $level, int $platformId){
         $this->platformId = $platformId;
@@ -79,6 +80,14 @@ class BridgerGameSession extends GameSession {
         $this->heightAdjustments = $heightAdjustments;
     }
 
+    public function isPlatformUpdateScheduled(): bool{
+        return $this->platformUpdateScheduled;
+    }
+
+    public function schedulePlatformUpdate(): void {
+        $this->platformUpdateScheduled = true;
+    }
+
     public function setRotation(int $rotation): void{
         $this->rotation = $rotation;
         $this->__rotation = array_keys(BridgerMinigame::ROTATION_LIST)[$this->getRotation()] ?? "default";
@@ -92,12 +101,17 @@ class BridgerGameSession extends GameSession {
         $this->gradient = $gradient;
     }
 
-    public function setY(int $y): void{
+    public function setY(int $y, bool $generate = true): void{
         $oldY = $this->y;
         if($this->isHeightAdjustments()) {
             $this->y = $y;
         }
-        if($oldY !== $y) $this->generateGoalPlatform();
+        if($oldY === $y) return;
+        if($generate){
+            $this->generateGoalPlatform();
+            return;
+        }
+        $this->schedulePlatformUpdate();
     }
 
     public function generateGoalPlatform(): void {
@@ -143,6 +157,7 @@ class BridgerGameSession extends GameSession {
             $level->setBlockIdAt($block->x, $block->y, $block->z, $block->getId());
             $level->setBlockDataAt($block->x, $block->y, $block->z, $block->getDamage());
             $this->addBlock($block, "platform");
+            $this->removeBlock($block);
         }
     }
 
