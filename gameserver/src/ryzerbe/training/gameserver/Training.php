@@ -23,6 +23,7 @@ use ryzerbe\training\gameserver\minigame\type\clutches\ClutchesMinigame;
 use ryzerbe\training\gameserver\minigame\type\hitblockclutch\HitBlockClutchMinigame;
 use ryzerbe\training\gameserver\minigame\type\kitpvp\KitPvPMinigame;
 use ryzerbe\training\gameserver\minigame\type\mlgrush\MLGRushMinigame;
+use ryzerbe\training\gameserver\minigame\type\speedclutch\SpeedClutchMinigame;
 use ryzerbe\training\gameserver\module\ModuleManager;
 use ryzerbe\training\gameserver\scheduler\TrainingUpdateTask;
 
@@ -72,6 +73,7 @@ class Training extends PluginBase {
             new BridgerMinigame(),
             new MLGRushMinigame(),
             new HitBlockClutchMinigame(),
+            new SpeedClutchMinigame(),
         ];
 
         foreach($minigames as $minigame) {

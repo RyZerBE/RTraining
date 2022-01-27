@@ -171,6 +171,9 @@ class Training extends PluginBase {
                 )),
 
             (new Minigame("Hit Block Clutch"))
+                ->setGroup("MLG-Training"),
+
+            (new Minigame("Speed Clutch"))
                 ->setGroup("MLG-Training")
 
             /*
