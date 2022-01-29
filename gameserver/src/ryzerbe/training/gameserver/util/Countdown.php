@@ -29,8 +29,8 @@ class Countdown {
         $this->countdown = $countdown;
     }
 
-    public function resetCountdown(): void {
-        $this->countdown = $this->originCountdown;
+    public function resetCountdown(?int $countdown = null): void {
+        $this->countdown = $countdown ?? $this->originCountdown;
     }
 
     public function setOriginCountdown(int $originCountdown): void{

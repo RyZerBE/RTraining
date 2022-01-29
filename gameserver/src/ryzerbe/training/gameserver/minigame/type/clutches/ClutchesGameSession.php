@@ -3,6 +3,7 @@
 namespace ryzerbe\training\gameserver\minigame\type\clutches;
 
 use pocketmine\block\BlockIds;
+use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Location;
@@ -11,29 +12,42 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\customitem\CustomItemManager;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
-use ryzerbe\training\gameserver\minigame\MinigameSettings;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
+use ryzerbe\training\gameserver\minigame\trait\StatesTrait;
+use ryzerbe\training\gameserver\minigame\type\clutches\entity\ClutchesEntity;
+use ryzerbe\training\gameserver\minigame\type\clutches\item\ClutchesConfigurationItem;
 use ryzerbe\training\gameserver\minigame\type\clutches\item\ClutchesStartItem;
 use ryzerbe\training\gameserver\minigame\type\clutches\item\ClutchesStopItem;
 use ryzerbe\training\gameserver\session\Session;
+use ryzerbe\training\gameserver\util\Countdown;
 use ryzerbe\training\gameserver\util\MinigameDefaultSlots;
 use ryzerbe\training\gameserver\util\ScoreboardUtils;
+use function array_filter;
+use function array_key_first;
+use function array_search;
+use function is_string;
 
 class ClutchesGameSession extends GameSession {
     use BlockStorageTrait;
+    use StatesTrait;
+
+    public const STATE_COUNTDOWN = 0;
+    public const STATE_HITTING = 1;
 
     private int $platformId;
-    private float|int $lastHit, $lastBlock;
-    private int $blockSaveLength = 0, $topBlockSaveLength = 0;
 
-    /** @var ClutchesSettings  */
-    private MinigameSettings $clutchesSettings;
+    private int $blockSaveLength = 0;
+    private int $topBlockSaveLength = 0;
+
+    private int $hitType = ClutchesMinigame::ONE_HIT;
+    private float $knockBackLevel = ClutchesMinigame::EASY;
+    private float $seconds = 5.0;
+
+    private Countdown $countdown;
 
     public function __construct(Session $session, Level $level, int $platformId){
         $this->platformId = $platformId;
-        $this->clutchesSettings = new ClutchesSettings();
-        $this->lastHit = 0;
-        $this->lastBlock = 0;
+        $this->countdown = new Countdown($this->seconds * 20);
         parent::__construct($session, $level);
     }
 
@@ -41,57 +55,45 @@ class ClutchesGameSession extends GameSession {
         return $this->platformId;
     }
 
-    /**
-     * @return ClutchesSettings
-     */
-    public function getSettings(): MinigameSettings{
-        return $this->clutchesSettings;
-    }
-
     public function getSpawn(): Location {
-        return new Location(8.5+ ($this->getPlatformId() * 32), 51, 8.5, 0, 0, $this->getLevel());
+        return new Location(8.5 + ($this->getPlatformId() * 32), 51, 8.5, 0, 0, $this->getLevel());
     }
 
-    public function reset(string $clutchesItemName = ClutchesStopItem::class): void{
+    public function reset(bool $teleport = true): void{
         $this->resetBlocks();
         /** @var PMMPPlayer $player */
         $player = $this->getSession()->getPlayer();
         if($player === null) return;
         $inventory = $player->getInventory();
-
-        $player->teleport($this->getSpawn()->subtract(0, 0, 1));
         $inventory->clearAll();
 
-        if($clutchesItemName !== ClutchesStartItem::class) {
+        $configurationItem = CustomItemManager::getInstance()->getCustomItemByClass(ClutchesConfigurationItem::class);
+        $configurationItem?->giveToPlayer($player, MinigameDefaultSlots::SLOT_CONFIGURATION_ITEM);
+
+        if($this->isRunning()) {
+            if($teleport) $player->teleport($this->getSpawn()->subtract(0, 0, 1));
             $inventory->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, Item::get(BlockIds::SANDSTONE, 0, 64));
+            $item = CustomItemManager::getInstance()->getCustomItemByClass(ClutchesStopItem::class);
+        } else {
+            if($teleport) $player->teleport($this->getSpawn());
+            $item = CustomItemManager::getInstance()->getCustomItemByClass(ClutchesStartItem::class);
         }
-        $item = CustomItemManager::getInstance()->getCustomItemByClass($clutchesItemName);
-        $item?->giveToPlayer($player, MinigameDefaultSlots::SLOT_OTHER_ITEM);
+
+        if($item !== null) {
+            $item->giveToPlayer($player, MinigameDefaultSlots::SLOT_OTHER_ITEM);
+            $player->resetItemCooldown($item->getItem(), 10);
+        }
 
         /** @var MinigameHubItem|null $leaveItem */
         $leaveItem = CustomItemManager::getInstance()->getCustomItemByClass(MinigameHubItem::class);
         $leaveItem?->giveToPlayer($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
 
-        $this->lastHit = 0;
-        $this->lastBlock = 0;
         $this->blockSaveLength = 0;
+
+        $this->setState(self::STATE_COUNTDOWN);
+        $this->countdown->setOriginCountdown($this->seconds * 20);
+        $this->countdown->resetCountdown();
         $this->sendScoreboard();
-    }
-
-    public function getLastBlock(): float|int{
-        return $this->lastBlock;
-    }
-
-    public function getLastHit(): float|int{
-        return $this->lastHit;
-    }
-
-    public function setLastBlockTime(float|int $lastBlock): void{
-        $this->lastBlock = $lastBlock;
-    }
-
-    public function setLastHitTime(float|int $lastHit): void{
-        $this->lastHit = $lastHit;
     }
 
     public function getBlockSaveLength(): int{
@@ -100,32 +102,60 @@ class ClutchesGameSession extends GameSession {
 
     public function setBlockSaveLength(int $blockSaveLength): void{
         $this->blockSaveLength = $blockSaveLength;
-        if($blockSaveLength > $this->topBlockSaveLength)
+        if($blockSaveLength > $this->topBlockSaveLength){
             $this->topBlockSaveLength = $blockSaveLength;
+        }
+    }
+
+    public function getEntity(): ?ClutchesEntity {
+        $platformId = $this->getPlatformId();
+        $entities = array_filter($this->getLevel()->getEntities(), function(Entity $entity) use ($platformId): bool {
+            return $entity instanceof ClutchesEntity && $entity->getPlatformId() === $platformId;
+        });
+        return $entities[array_key_first($entities)] ?? null;
     }
 
     public function getTopBlockSaveLength(): int{
         return $this->topBlockSaveLength;
     }
 
+    public function getKnockBackLevel(): float{
+        return $this->knockBackLevel;
+    }
+
+    public function getHitType(): int{
+        return $this->hitType;
+    }
+
+    public function getSeconds(): float{
+        return $this->seconds;
+    }
+
+    public function getCountdown(): Countdown{
+        return $this->countdown;
+    }
+
+    public function setHitType(int $hitType): void{
+        $this->hitType = $hitType;
+    }
+
+    public function setKnockBackLevel(float $knockBackLevel): void{
+        $this->knockBackLevel = $knockBackLevel;
+    }
+
+    public function setSeconds(float $seconds): void{
+        $this->seconds = $seconds;
+    }
+
     public function sendScoreboard(): void{
         $player = $this->getSession()->getPlayer();
         if($player === null) return;
 
-        $knockBackString = match($this->getSettings()->knockBackLevel){
-            ClutchesSettings::EASY => "Easy",
-            ClutchesSettings::NORMAL => "Normal",
-            ClutchesSettings::HARD => "Hard",
-            default => "???"
-        };
+        $key = array_search($this->getHitType(), ClutchesMinigame::HIT_TYPES);
+        $hitType = !is_string($key) ? "???" : $key;
+        $key = array_search($this->getKnockBackLevel(), ClutchesMinigame::KNOCKBACK_LEVELS);
+        $knockBackLevel = !is_string($key) ? "???" : $key;
 
-        $hitString = match ($this->getSettings()->hit) {
-            ClutchesSettings::ONE_HIT => "One hit",
-            ClutchesSettings::DOUBLE_HIT => "Double hit",
-            ClutchesSettings::TRIPLE_HIT => "Triple hit",
-            ClutchesSettings::QUADRUPLE_HIT => "Quadruple hit",
-            default => "???"
-        };
         ScoreboardUtils::rmScoreboard($player, "training");
         ScoreboardUtils::createScoreboard($player, $this->getSettings()->PREFIX, "training");
         ScoreboardUtils::setScoreboardEntry($player, 0, "", "training");
@@ -134,9 +164,9 @@ class ClutchesGameSession extends GameSession {
         ScoreboardUtils::setScoreboardEntry($player, 3, TextFormat::GRAY."○ Length", "training");
         ScoreboardUtils::setScoreboardEntry($player, 4, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$this->getBlockSaveLength(), "training");
         ScoreboardUtils::setScoreboardEntry($player, 5, TextFormat::GRAY."○ Knockback", "training");
-        ScoreboardUtils::setScoreboardEntry($player, 6, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$knockBackString, "training");
+        ScoreboardUtils::setScoreboardEntry($player, 6, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$knockBackLevel, "training");
         ScoreboardUtils::setScoreboardEntry($player, 7, TextFormat::GRAY."○ Hit", "training");
-        ScoreboardUtils::setScoreboardEntry($player, 8, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$hitString, "training");
+        ScoreboardUtils::setScoreboardEntry($player, 8, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$hitType, "training");
         ScoreboardUtils::setScoreboardEntry($player, 9, "", "training");
         ScoreboardUtils::setScoreboardEntry($player, 10, TextFormat::WHITE."⇨ ".TextFormat::AQUA."ryzer.be", "training");
     }

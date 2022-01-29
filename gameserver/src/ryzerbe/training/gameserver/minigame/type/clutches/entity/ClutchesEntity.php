@@ -5,7 +5,6 @@ namespace ryzerbe\training\gameserver\minigame\type\clutches\entity;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Human;
 use pocketmine\entity\Skin;
-use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\level\ChunkLoader;
 use pocketmine\level\format\Chunk;
@@ -14,15 +13,17 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use ryzerbe\training\gameserver\minigame\type\clutches\form\ClutchesSettingForm;
 use function atan;
 use function atan2;
 use function rad2deg;
 use function spl_object_id;
 
 class ClutchesEntity extends Human implements ChunkLoader {
-    public function __construct(Location $location, Skin $skin){
+    private int $platformId;
+
+    public function __construct(Location $location, Skin $skin, int $platformId){
         $this->skin = $skin;
+        $this->platformId = $platformId;
         parent::__construct($location->getLevelNonNull(), Entity::createBaseNBT($location, null, $location->yaw, $location->pitch));
         $this->getLevel()->registerChunkLoader($this, $location->x >> 4, $location->z >> 4, true);
     }
@@ -35,6 +36,10 @@ class ClutchesEntity extends Human implements ChunkLoader {
         $this->setNameTagAlwaysVisible();
         $this->setImmobile();
         $this->sendSkin();
+    }
+
+    public function getPlatformId(): int {
+        return $this->platformId;
     }
 
     public function onUpdate(int $currentTick): bool{
@@ -62,12 +67,7 @@ class ClutchesEntity extends Human implements ChunkLoader {
     }
 
     public function attack(EntityDamageEvent $source): void{
-        if(!$source instanceof EntityDamageByEntityEvent) return;
         $source->setCancelled();
-        $damager = $source->getDamager();
-        if(!$damager instanceof Player) return;
-
-        ClutchesSettingForm::open($damager);
     }
 
     public function getLoaderId(): int{
