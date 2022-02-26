@@ -2,6 +2,7 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\clutches;
 
+use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -68,8 +69,8 @@ class ClutchesMinigame extends Minigame {
 
         Entity::registerEntity(ClutchesEntity::class, true);
         $items = [
-            new ClutchesStartItem(Item::get(ItemIds::EMERALD)->setCustomName(TextFormat::DARK_GREEN."Start"),4),
-            new ClutchesStopItem(Item::get(ItemIds::REDSTONE_DUST)->setCustomName(TextFormat::RED."Stop"),4),
+            new ClutchesStartItem(Item::get(ItemIds::RECORD_FAR)->setCustomName(TextFormat::DARK_GREEN."Start"),4),
+            new ClutchesStopItem(Item::get(ItemIds::RECORD_MALL)->setCustomName(TextFormat::RED."Stop"),4),
             new ClutchesConfigurationItem(Item::get(ItemIds::BOOK)->setCustomName(TextFormat::RED."Settings"), 8),
         ];
         CustomItemManager::getInstance()->registerAll($items);
@@ -85,7 +86,7 @@ class ClutchesMinigame extends Minigame {
         $gameSession = $session->getGameSession();
         if(!$gameSession instanceof ClutchesGameSession) return false;
         $player = $session->getPlayer();
-        if($player === null) return false;
+        if(!$player instanceof PMMPPlayer) return false;
         if($gameSession->isRunning()) {
             $countdown = $gameSession->getCountdown();
             switch($gameSession->getState()) {
@@ -109,17 +110,18 @@ class ClutchesMinigame extends Minigame {
                         $player->attack($ev);
 
                         $length = (int)$gameSession->getSpawn()->distance(new Vector3($player->x, $gameSession->getSpawn()->y, $player->z));
-                        if($length > 0) {
+                        if($length > 2 && $player->getBlockUnderPlayer()->getId() === BlockIds::SANDSTONE) {
                             $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer('clutches-length-count', $player->getName(), ['#lengthCount' => $length]));
                             $player->playSound("random.levelup", 5.0, 1.0, [$player]);
                             $gameSession->setBlockSaveLength($length);
                             $gameSession->sendScoreboard();
                         }
-                        $countdown->resetCountdown();
-                        $gameSession->setState(ClutchesGameSession::STATE_COUNTDOWN);
+
+						$countdown->resetCountdown();
+						$gameSession->setState(ClutchesGameSession::STATE_COUNTDOWN);
                         return true;
                     }
-                    if($countdown->getCountdown() % 20 === 0) {
+                    if($countdown->getCountdown() % 10 === 0) {
                         $ev = new EntityDamageByEntityEvent($gameSession->getEntity(), $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0, [], $gameSession->getKnockBackLevel());
                         $player->attack($ev);
                     }
