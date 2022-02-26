@@ -39,7 +39,7 @@ class SpeedClutchMinigame extends Minigame {
         parent::__construct();
         CustomItemManager::getInstance()->registerAll([
             new SpeedClutchMinigameConfigurationItem(Item::get(ItemIds::BOOK)->setCustomName(TextFormat::RED."Settings"), 8),
-            new SpeedClutchMinigameResetItem(Item::get(ItemIds::DYE, 15)->setCustomName(TextFormat::RED."Reset"), 5),
+            new SpeedClutchMinigameResetItem(Item::get(ItemIds::RECORD_MELLOHI)->setCustomName(TextFormat::RED."Reset"), 5),
         ]);
 
         GeneratorManager::addGenerator(SpeedClutchGenerator::class, "speedclutch", true);

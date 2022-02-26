@@ -43,7 +43,7 @@ class HitBlockClutchMinigame extends Minigame {
         parent::__construct();
         CustomItemManager::getInstance()->registerAll([
             new HitBlockClutchMinigameConfigurationItem(Item::get(ItemIds::BOOK)->setCustomName(TextFormat::RED."Settings"), 8),
-            new HitBlockClutchMinigameResetItem(Item::get(ItemIds::DYE, 15)->setCustomName(TextFormat::RED."Reset"), 5),
+            new HitBlockClutchMinigameResetItem(Item::get(ItemIds::RECORD_MELLOHI)->setCustomName(TextFormat::RED."Reset"), 5),
         ]);
 
         GeneratorManager::addGenerator(HitBlockClutchGenerator::class, "hitblockclutch", true);

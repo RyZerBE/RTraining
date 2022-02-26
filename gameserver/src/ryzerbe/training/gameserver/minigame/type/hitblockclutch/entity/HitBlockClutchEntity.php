@@ -57,6 +57,9 @@ class HitBlockClutchEntity extends Human implements ChunkLoader {
         }
         $player = $source->getDamager();
         if(!$player instanceof Player || ($gameSession = $this->getGameSession())->getSession()->getPlayer()?->getId() !== $player->getId() || $gameSession->getModule() !== $this->getModule()) return;
+        if(!$gameSession instanceof HitBlockClutchGameSession) return;
+        if(!$gameSession->isTimerRunning()) return;
+
         $player->playSound("random.orb", 5.0, 1.0, [$player]);
         $this->flagForDespawn();
     }
