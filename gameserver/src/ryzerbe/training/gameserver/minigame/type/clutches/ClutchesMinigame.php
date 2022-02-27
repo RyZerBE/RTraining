@@ -7,12 +7,12 @@ use pocketmine\entity\Entity;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\player\PlayerDeathEvent;
+use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\level\generator\GeneratorManager;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
@@ -44,7 +44,7 @@ class ClutchesMinigame extends Minigame {
     public const NORMAL = 1.0;
     public const HARD = 1.3;
 
-    public const HIT_DELAY = 20;
+    public const HIT_DELAY = 10;
 
     public const HIT_TYPES = [
         "One hit" => self::ONE_HIT,
@@ -93,11 +93,7 @@ class ClutchesMinigame extends Minigame {
                 case ClutchesGameSession::STATE_COUNTDOWN: {
                     $player->sendActionBarMessage(TextFormat::GOLD.TextFormat::BOLD.number_format($countdown->getCountdown() / 20, 2)." Seconds..");
                     if($countdown->hasFinished()) {
-                        if($gameSession->getHitType() === self::ONE_HIT) {
-                            $countdown->resetCountdown(0);
-                        } else {
-                            $countdown->resetCountdown(($gameSession->getHitType() * self::HIT_DELAY) - self::HIT_DELAY);
-                        }
+                        $countdown->resetCountdown(($gameSession->getHitType() * self::HIT_DELAY) - self::HIT_DELAY);
                         $gameSession->setState(ClutchesGameSession::STATE_HITTING);
                         return true;
                     }
@@ -106,22 +102,34 @@ class ClutchesMinigame extends Minigame {
                 }
                 case ClutchesGameSession::STATE_HITTING: {
                     if($countdown->hasFinished()) {
-                        $ev = new EntityDamageByEntityEvent($gameSession->getEntity(), $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0, [], 100);
-                        $player->attack($ev);
+                        switch($countdown->getCountdown()) {
+                            case 0: {
+                                $countdown->setCountdown(-1);
+                                $player->addDelay("clutches_cooldown", 0.25);
 
-                        $length = (int)$gameSession->getSpawn()->distance(new Vector3($player->x, $gameSession->getSpawn()->y, $player->z));
-                        if($length > 2 && $player->getBlockUnderPlayer()->getId() === BlockIds::SANDSTONE) {
-                            $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer('clutches-length-count', $player->getName(), ['#lengthCount' => $length]));
-                            $player->playSound("random.levelup", 5.0, 1.0, [$player]);
-                            $gameSession->setBlockSaveLength($length);
-                            $gameSession->sendScoreboard();
+                                $ev = new EntityDamageByEntityEvent($gameSession->getEntity(), $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0, [], 100);
+                                $player->attack($ev);
+                                return true;
+                            }
+                            default: {
+                                if($player->hasDelay("clutches_cooldown")) return true;
+                                if($player->isOnGround()) {
+                                    $length = (int)$gameSession->getSpawn()->distance(new Vector3($player->x, $gameSession->getSpawn()->y, $player->z));
+                                    if($length > 2) {
+                                        $player->sendMessage(Training::PREFIX.LanguageProvider::getMessageContainer('clutches-length-count', $player->getName(), ['#lengthCount' => $length]));
+                                        $player->playSound("random.levelup", 5.0, 1.0, [$player]);
+                                        $gameSession->setBlockSaveLength($length);
+                                        $gameSession->sendScoreboard();
+                                    }
+
+                                    $countdown->resetCountdown();
+                                    $gameSession->setState(ClutchesGameSession::STATE_COUNTDOWN);
+                                }
+                            }
                         }
-
-						$countdown->resetCountdown();
-						$gameSession->setState(ClutchesGameSession::STATE_COUNTDOWN);
                         return true;
                     }
-                    if($countdown->getCountdown() % 10 === 0) {
+                    if($countdown->getCountdown() % self::HIT_DELAY === 0) {
                         $ev = new EntityDamageByEntityEvent($gameSession->getEntity(), $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0, [], $gameSession->getKnockBackLevel());
                         $player->attack($ev);
                     }
@@ -203,6 +211,14 @@ class ClutchesMinigame extends Minigame {
         $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
         if(!$gameSession instanceof ClutchesGameSession) return;
         $event->setDeathMessage("");
+
         $gameSession->reset();
+    }
+
+    public function onPlayerRespawn(PlayerRespawnEvent $event): void {
+        $player = $event->getPlayer();
+        $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
+        if(!$gameSession instanceof ClutchesGameSession) return;
+        $player->noDamageTicks = 0;
     }
 }
