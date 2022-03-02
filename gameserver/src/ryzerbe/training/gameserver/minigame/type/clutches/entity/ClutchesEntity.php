@@ -52,7 +52,7 @@ class ClutchesEntity extends Human implements ChunkLoader {
                 $yaw = rad2deg(atan2(-$dir->getX(), $dir->getZ()));
                 $pitch = rad2deg(atan(-$dir->getY()));
 
-                $this->setRotation($this->yaw, $this->pitch);
+                $this->setRotation($yaw, $pitch);
 
                 $pk = new MovePlayerPacket();
                 $pk->entityRuntimeId = $this->getId();
