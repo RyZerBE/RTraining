@@ -107,7 +107,7 @@ class ClutchesMinigame extends Minigame {
                                 $countdown->setCountdown(-1);
                                 $player->addDelay("clutches_cooldown", 0.25);
 
-                                $ev = new EntityDamageByEntityEvent($gameSession->getEntity(), $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0, [], 100);
+                                $ev = new EntityDamageByEntityEvent($gameSession->getEntity(), $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0, [], 10);
                                 $player->attack($ev);
                                 return true;
                             }
