@@ -21,6 +21,7 @@ use function mt_rand;
 class VoteSettingsForm {
     public static function open(Player $player): void {
         $form = new CustomForm(function(Player $player, mixed $data): void {
+
             $session = SessionManager::getInstance()->getSessionOfPlayer($player);
             $gameSession = $session?->getGameSession();
             if(!$gameSession instanceof MLGRushGameSession || $gameSession->isRunning()) return;
