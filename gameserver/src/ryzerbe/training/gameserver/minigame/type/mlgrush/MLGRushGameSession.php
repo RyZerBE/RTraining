@@ -9,11 +9,11 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\level\Level;
 use pocketmine\math\AxisAlignedBB;
+use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\tile\Bed as TileBed;
 use pocketmine\tile\Tile;
 use pocketmine\utils\TextFormat;
-use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\util\ItemUtils;
 use ryzerbe\statssystem\provider\StatsAsyncProvider;
 use ryzerbe\training\gameserver\game\GameSession;
@@ -270,8 +270,7 @@ class MLGRushGameSession extends GameSession {
             }
 
             foreach($session->getOnlinePlayers() as $sessionPlayer){
-                $ryZerPlayer = RyZerPlayerProvider::getRyzerPlayer($sessionPlayer);
-                $sessionPlayer->sendTitle($winner->getColor().$ryZerPlayer?->getName(true), TextFormat::GREEN." WON THE FIGHT!");
+                $sessionPlayer->sendTitle($winner->getColor().$winner->getName(), TextFormat::GREEN." WON THE FIGHT!");
             }
             $this->startCountdown(8, Countdown::END);
             $this->setState(Countdown::END);
