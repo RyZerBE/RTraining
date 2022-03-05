@@ -49,8 +49,10 @@ class MLGRushGameSession extends GameSession {
     private bool $rushProtection = false;
     private bool $damage = true;
     private int $maxPoints = PHP_INT_MAX;
+	public int $waiting = 0;
 
-    private ?AxisAlignedBB $mapBoundingBox = null;
+
+	private ?AxisAlignedBB $mapBoundingBox = null;
 
     private ?Countdown $countdown;
 

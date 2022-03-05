@@ -115,10 +115,18 @@ class MLGRushMinigame extends Minigame {
                                     $countdown->setCountdown(0);
                                     break;
                                 }
-                                return true;
+								$gameSession->waiting++;
+								foreach($session->getOnlinePlayers() as $player) {
+									$player->sendTitle(TextFormat::RED."WAITING VOTING...");
+								}
+								if($gameSession->waiting < 5) return true;
                             }
                             if($gameSession->getVotes() < ($playerCount / 2)) {
-                                return true;
+								$gameSession->waiting++;
+								foreach($session->getOnlinePlayers() as $player) {
+									$player->sendTitle(TextFormat::RED."WAITING VOTING...");
+								}
+								if($gameSession->waiting < 5) return true;
                             }
                             break;
                         }
