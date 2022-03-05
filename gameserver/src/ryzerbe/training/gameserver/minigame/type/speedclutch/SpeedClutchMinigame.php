@@ -13,11 +13,11 @@ use pocketmine\item\ItemIds;
 use pocketmine\level\generator\GeneratorManager;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\customitem\CustomItemManager;
 use ryzerbe\training\gameserver\game\GameSession;
@@ -140,7 +140,8 @@ class SpeedClutchMinigame extends Minigame {
                             $gameSession->updateScore();
                             $gameSession->resetGame();
                             $player->playSound("random.levelup", 5.0, 1.0, [$player]);
-                            $player->sendMessage($gameSession->getSettings()->PREFIX.LanguageProvider::getMessageContainer("speedclutch-end-reached", $player->getName(), ["#time" => number_format($gameSession->getScore(), 2)]));
+                            $ryZerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
+                            $player->sendMessage($gameSession->getSettings()->PREFIX.LanguageProvider::getMessageContainer("speedclutch-end-reached", $ryZerPlayer?->getName(true), ["#time" => number_format($gameSession->getScore(), 2)]));
                         }
                         return;
                     }
