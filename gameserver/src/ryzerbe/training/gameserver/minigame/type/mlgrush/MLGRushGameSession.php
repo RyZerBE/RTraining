@@ -157,11 +157,11 @@ class MLGRushGameSession extends GameSession {
     		$this->setMaxPoints(5);
 		}
 
-        $this->setInfiniteBlocks(boolval(array_key_first($this->sortVoting($this->getVoting()["infiniteBlocks"] ?? false))));
-        $this->setDamageActivate(boolval(array_key_first($this->sortVoting($this->getVoting()["damage"] ?? false))));
+        $this->setInfiniteBlocks(boolval(array_key_first($this->sortVoting($this->getVoting()["infiniteBlocks"] ?? []))));
+        $this->setDamageActivate(boolval(array_key_first($this->sortVoting($this->getVoting()["damage"] ?? []))));
         //$this->setWallsEnabled(boolval(array_key_first($this->sortVoting($this->getVoting()["wallsEnabled"] ?? false))));
         $this->setWallsEnabled(false);
-        $this->setRushProtection(boolval(array_key_first($this->sortVoting($this->getVoting()["rushProtection"] ?? false))));
+        $this->setRushProtection(boolval(array_key_first($this->sortVoting($this->getVoting()["rushProtection"] ?? []))));
     }
 
     private function sortVoting(array $voting): array {
