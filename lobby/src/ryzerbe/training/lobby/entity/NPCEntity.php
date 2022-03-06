@@ -34,6 +34,7 @@ class NPCEntity extends Human implements ChunkLoader {
     private array $emotes = [];
     private int $emoteCooldown = 0;
     private string $lastEmote = "";
+    private Location $location;
 
     private bool $lookAtPlayer = false;
 
@@ -52,6 +53,7 @@ class NPCEntity extends Human implements ChunkLoader {
             return;
         }
         $this->skin = $skin;
+        $this->location = $location;
         $level = $location->getLevelNonNull();
         $level->registerChunkLoader($this, $location->x >> 4, $location->z >> 4, true);
         parent::__construct($level, Entity::createBaseNBT($location, null, $location->yaw, $location->pitch));
@@ -138,6 +140,7 @@ class NPCEntity extends Human implements ChunkLoader {
 
             if(count($this->getEmotes()) > 1) $this->lastEmote = $emote;
         }
+		$this->teleport($this->location);
         return parent::onUpdate($currentTick);
     }
 
