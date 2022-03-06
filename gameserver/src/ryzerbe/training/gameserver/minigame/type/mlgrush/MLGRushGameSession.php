@@ -150,7 +150,13 @@ class MLGRushGameSession extends GameSession {
     }
 
     public function validateVoting(): void {
-        $this->setMaxPoints(array_key_first($this->getVoting()["points"] ?? 5));
+    	if(isset($this->getVoting()["points"])) {
+			if(!is_array($this->getVoting()["points"])) $this->setMaxPoints(5);
+			else $this->setMaxPoints(array_key_first($this->getVoting()["points"] ?? 5));
+		}else {
+    		$this->setMaxPoints(5);
+		}
+
         $this->setInfiniteBlocks(boolval(array_key_first($this->sortVoting($this->getVoting()["infiniteBlocks"] ?? false))));
         $this->setDamageActivate(boolval(array_key_first($this->sortVoting($this->getVoting()["damage"] ?? false))));
         //$this->setWallsEnabled(boolval(array_key_first($this->sortVoting($this->getVoting()["wallsEnabled"] ?? false))));
