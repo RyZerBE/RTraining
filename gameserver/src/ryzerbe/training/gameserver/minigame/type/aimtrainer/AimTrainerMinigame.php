@@ -6,6 +6,7 @@ use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\EntityIds;
+use pocketmine\entity\projectile\Snowball;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\item\Item;
@@ -81,6 +82,10 @@ class AimTrainerMinigame extends Minigame {
     public function onDamage(EntityDamageEvent $event): void{
         if($event->getCause() === EntityDamageEvent::CAUSE_VOID) {
             $entity = $event->getEntity();
+            if($entity instanceof Snowball && $this->getLevel()->getId() === $entity->getLevel()->getId()) {
+                $entity->flagForDespawn();
+                return;
+            }
             if(!$entity instanceof Player) return;
             $gameSession = SessionManager::getInstance()->getSessionOfPlayer($entity)?->getGameSession();
             if(!$gameSession instanceof AimTrainerGameSession) return;

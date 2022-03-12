@@ -15,6 +15,7 @@ use ryzerbe\training\gameserver\block\BedBlock;
 use ryzerbe\training\gameserver\command\EnchantCommand;
 use ryzerbe\training\gameserver\command\KitCommand;
 use ryzerbe\training\gameserver\command\LeaveCommand;
+use ryzerbe\training\gameserver\command\TFCommand;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
 use ryzerbe\training\gameserver\minigame\MinigameManager;
 use ryzerbe\training\gameserver\minigame\type\aimtrainer\AimTrainerMinigame;
@@ -47,7 +48,8 @@ class Training extends PluginBase {
         $this->getServer()->getCommandMap()->registerAll("Training", [
             new LeaveCommand(),
             new KitCommand(),
-            new EnchantCommand()
+            new EnchantCommand(),
+            new TFCommand()
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(new TrainingUpdateTask(), 1);
