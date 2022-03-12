@@ -1,5 +1,5 @@
 name: Training-GameServer
-version: 1.2.1
+version: 1.2.2
 api: 3.0.0
 main: ryzerbe\training\gameserver\Training
 load: POSTWORLD

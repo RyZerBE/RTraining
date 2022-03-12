@@ -5,7 +5,9 @@ namespace ryzerbe\training\gameserver\minigame\type\aimtrainer;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
+use pocketmine\entity\EntityIds;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\level\generator\GeneratorManager;
@@ -110,7 +112,10 @@ class AimTrainerMinigame extends Minigame {
         /** @var AimTrainerGameSession $gameSession */
         $gameSession = $session->getGameSession();
 
-        $gameSession->getEntity()?->flagForDespawn();
+        $entity = $gameSession->getEntity();
+        if($entity !== null && !$entity->isClosed()) {
+            $entity->flagForDespawn();
+        }
         $gameSession->getLevel()->setBlock($gameSession->getBlockPosition(), Block::get(BlockIds::AIR));
 
         $player = $session->getPlayer();
@@ -118,5 +123,14 @@ class AimTrainerMinigame extends Minigame {
 
         $player->getInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
+    }
+
+    public function onProjectileHit(ProjectileHitEvent $event): void {
+        $entity = $event->getEntity();
+        if($entity::NETWORK_ID !== EntityIds::ARROW && !$entity->isClosed()) return;
+
+        if($this->getLevel()->getId() === $entity->getLevel()?->getId()) {
+            $entity->flagForDespawn();
+        }
     }
 }

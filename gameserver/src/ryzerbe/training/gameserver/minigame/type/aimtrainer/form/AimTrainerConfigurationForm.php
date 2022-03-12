@@ -42,7 +42,11 @@ class AimTrainerConfigurationForm {
 
             $gameSession->setDistance($distance);
             $gameSession->setItemId($itemId);
-            $gameSession->getEntity()?->flagForDespawn();
+
+            $entity = $gameSession->getEntity();
+            if($entity !== null && !$entity->isClosed()) {
+                $entity->flagForDespawn();
+            }
 
             $spawn->getLevel()->setBlock($gameSession->getBlockPosition(), Block::get(BlockIds::SEA_LANTERN));
 
