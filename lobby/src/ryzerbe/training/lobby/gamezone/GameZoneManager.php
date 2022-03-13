@@ -57,7 +57,7 @@ class GameZoneManager {
         $inventory->setContents([
             0 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_SWORD), [
                 Enchantment::UNBREAKING => 5,
-                Enchantment::SHARPNESS => 1,
+                Enchantment::SHARPNESS => 3,
             ])->setCustomName("§r§6Diamond Sword"),
             1 => ItemUtils::addEnchantments(Item::get(ItemIds::GOLDEN_PICKAXE)->setCustomName("§r§6Pickaxe"), [
                 Enchantment::EFFICIENCY => 1,
@@ -72,19 +72,15 @@ class GameZoneManager {
         $armorInventory->setContents([
             0 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_HELMET), [
                 Enchantment::UNBREAKING => 3,
-                Enchantment::PROTECTION => 1,
             ])->setCustomName("§r§6Diamond Helmet"),
             1 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_CHESTPLATE), [
                 Enchantment::UNBREAKING => 3,
-                Enchantment::PROTECTION => 1,
             ])->setCustomName("§r§6Diamond Chestplate"),
             2 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_LEGGINGS), [
                 Enchantment::UNBREAKING => 3,
-                Enchantment::PROTECTION => 1,
             ])->setCustomName("§r§6Diamond Leggings"),
             3 => ItemUtils::addEnchantments(Item::get(ItemIds::DIAMOND_BOOTS), [
                 Enchantment::UNBREAKING => 3,
-                Enchantment::PROTECTION => 1,
             ])->setCustomName("§r§6Diamond Boots"),
         ]);
 
