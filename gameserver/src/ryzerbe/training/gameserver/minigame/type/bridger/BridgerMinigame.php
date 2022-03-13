@@ -98,7 +98,7 @@ class BridgerMinigame extends Minigame {
         $player->setImmobile(false);
         $player->setGamemode(Player::SURVIVAL);
 
-        $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, Item::get(BlockIds::SANDSTONE, 0, 64));
+        $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $gameSession->getBlockSkin());
         CustomItemManager::getInstance()->getCustomItemByClass(BridgerMinigameConfigurationItem::class)?->giveToPlayer($player, MinigameDefaultSlots::SLOT_CONFIGURATION_ITEM);
         CustomItemManager::getInstance()->getCustomItemByClass(MinigameHubItem::class)?->giveToPlayer($player, MinigameDefaultSlots::SLOT_LEAVE_ITEM);
 
@@ -136,7 +136,8 @@ class BridgerMinigame extends Minigame {
         $gameSession = SessionManager::getInstance()->getSessionOfPlayer($player)?->getGameSession();
         if(!$gameSession instanceof BridgerGameSession) return;
         $block = $event->getBlock();
-        if($block->getId() !== BlockIds::SANDSTONE){
+        $blockSkin = $gameSession->getBlockSkin();
+        if(!$blockSkin->equals($block->getPickedItem(), true, false)){
             $event->setCancelled();
             return;
         }
@@ -145,7 +146,7 @@ class BridgerMinigame extends Minigame {
             $gameSession->startTimer($gameSession->__getRotation());
         }
         $gameSession->setY($block->getFloorY(), false);
-        $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $block->getPickedItem()->setCount(64));
+        $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $blockSkin);
     }
 
     public function onPlayerMove(PlayerMoveEvent $event): void {

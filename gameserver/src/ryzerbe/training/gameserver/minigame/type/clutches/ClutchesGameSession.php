@@ -12,6 +12,7 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\customitem\CustomItemManager;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\minigame\item\MinigameHubItem;
+use ryzerbe\training\gameserver\minigame\trait\BlockSkinTrait;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
 use ryzerbe\training\gameserver\minigame\trait\StatesTrait;
 use ryzerbe\training\gameserver\minigame\type\clutches\entity\ClutchesEntity;
@@ -30,6 +31,7 @@ use function is_string;
 class ClutchesGameSession extends GameSession {
     use BlockStorageTrait;
     use StatesTrait;
+    use BlockSkinTrait;
 
     public const STATE_COUNTDOWN = 0;
     public const STATE_HITTING = 1;
@@ -42,6 +44,7 @@ class ClutchesGameSession extends GameSession {
     private int $hitType = ClutchesMinigame::ONE_HIT;
     private float $knockBackLevel = ClutchesMinigame::EASY;
     private float $seconds = 5.0;
+    private ?Item $blockSkin = null;
 
     private Countdown $countdown;
 
@@ -72,7 +75,7 @@ class ClutchesGameSession extends GameSession {
 
         if($this->isRunning()) {
             if($teleport) $player->teleport($this->getSpawn()->subtract(0, 0, 1));
-            $inventory->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, Item::get(BlockIds::SANDSTONE, 0, 64));
+            $inventory->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $this->getBlockSkin());
             $item = CustomItemManager::getInstance()->getCustomItemByClass(ClutchesStopItem::class);
         } else {
             if($teleport) $player->teleport($this->getSpawn());
@@ -169,5 +172,14 @@ class ClutchesGameSession extends GameSession {
         ScoreboardUtils::setScoreboardEntry($player, 8, TextFormat::DARK_GRAY."⇨ ".TextFormat::GREEN.$hitType, "training");
         ScoreboardUtils::setScoreboardEntry($player, 9, "", "training");
         ScoreboardUtils::setScoreboardEntry($player, 10, TextFormat::WHITE."⇨ ".TextFormat::AQUA."ryzer.be", "training");
+    }
+
+    public function getBlockSkins(): array{
+        return [
+            Item::get(BlockIds::SANDSTONE),
+            Item::get(BlockIds::SLIME_BLOCK),
+            Item::get(BlockIds::ICE),
+            Item::get(BlockIds::PACKED_ICE),
+        ];
     }
 }

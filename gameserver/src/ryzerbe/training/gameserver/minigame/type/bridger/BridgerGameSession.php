@@ -4,15 +4,18 @@ namespace ryzerbe\training\gameserver\minigame\type\bridger;
 
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
+use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\utils\TextFormat;
 use ryzerbe\training\gameserver\game\GameSession;
+use ryzerbe\training\gameserver\minigame\trait\BlockSkinTrait;
 use ryzerbe\training\gameserver\minigame\trait\BlockStorageTrait;
 use ryzerbe\training\gameserver\minigame\trait\StopWatchTrait;
 use ryzerbe\training\gameserver\session\Session;
+use ryzerbe\training\gameserver\util\MinigameDefaultSlots;
 use ryzerbe\training\gameserver\util\ScoreboardUtils;
 use function array_keys;
 use function array_search;
@@ -25,6 +28,7 @@ use function sin;
 class BridgerGameSession extends GameSession {
     use BlockStorageTrait;
     use StopWatchTrait;
+    use BlockSkinTrait;
 
     private int $platformId;
     private Location $spawn;
@@ -101,6 +105,15 @@ class BridgerGameSession extends GameSession {
         $this->gradient = $gradient;
     }
 
+    public function getBlockSkins(): array{
+        return [
+            Item::get(BlockIds::SANDSTONE),
+            Item::get(BlockIds::SLIME_BLOCK),
+            Item::get(BlockIds::ICE),
+            Item::get(BlockIds::PACKED_ICE),
+        ];
+    }
+
     public function setY(int $y, bool $generate = true): void{
         $oldY = $this->y;
         if($this->isHeightAdjustments()) {
@@ -169,6 +182,7 @@ class BridgerGameSession extends GameSession {
         $this->resetBlocks();
         $this->resetTimer($this->__getRotation());
         $this->setY(BridgerMinigame::BASE_Y);
+        $player->getInventory()->setItem(MinigameDefaultSlots::SLOT_BLOCK_ITEM, $this->getBlockSkin());
     }
 
     public function sendScoreboard(): void{

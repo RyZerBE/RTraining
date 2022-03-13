@@ -3,12 +3,14 @@
 namespace ryzerbe\training\gameserver\minigame\type\clutches\form;
 
 use jojoe77777\FormAPI\CustomForm;
+use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use ryzerbe\training\gameserver\minigame\type\clutches\ClutchesGameSession;
 use ryzerbe\training\gameserver\minigame\type\clutches\ClutchesMinigame;
 use ryzerbe\training\gameserver\session\SessionManager;
 use function array_keys;
+use function array_map;
 use function array_search;
 use function array_values;
 use function is_int;
@@ -34,6 +36,7 @@ class ClutchesSettingForm {
 
             $gameSession->setHitType(array_values(ClutchesMinigame::HIT_TYPES)[$data["hitType"]]);
             $gameSession->setKnockBackLevel(array_values(ClutchesMinigame::KNOCKBACK_LEVELS)[$data["knockBackLevel"]]);
+            $gameSession->setBlockSkin($gameSession->getBlockSkins()[$data["blockSkin"]]);
             $gameSession->setSeconds($data["seconds"]);
             $gameSession->reset();
             $gameSession->sendScoreboard();
@@ -41,6 +44,9 @@ class ClutchesSettingForm {
        });
 
        $form->setTitle(ClutchesMinigame::$PREFIX);
+        $form->addDropdown("§cBlock", array_map(function(Item $item): string {
+            return $item->getVanillaName();
+        }, $gameSession->getBlockSkins()), $gameSession->getBlockSkinKey(), "blockSkin");
        $form->addDropdown(TextFormat::RED."Hit type", array_keys(ClutchesMinigame::HIT_TYPES), $hitTypeKey, "hitType");
        $form->addDropdown(TextFormat::RED."Knockback level", array_keys(ClutchesMinigame::KNOCKBACK_LEVELS), $knockBackLevelKey, "knockBackLevel");
        $form->addSlider(TextFormat::RED."Seconds", 2, 5, 1, (int)$gameSession->getSeconds(), "seconds");

@@ -3,6 +3,7 @@
 namespace ryzerbe\training\gameserver\minigame\type\bridger\form;
 
 use jojoe77777\FormAPI\CustomForm;
+use pocketmine\item\Item;
 use pocketmine\Player;
 use ryzerbe\training\gameserver\minigame\type\bridger\BridgerGameSession;
 use ryzerbe\training\gameserver\minigame\type\bridger\BridgerMinigame;
@@ -26,6 +27,8 @@ class BridgerMinigameConfigurationForm {
         $form = new CustomForm(function(Player $player, mixed $data) use ($gameSession): void {
             if($data === null) return;
 
+            $gameSession->setBlockSkin($gameSession->getBlockSkins()[$data["blockSkin"]]);
+
             $gameSession->reset();
 
             $gameSession->setRotation(array_values(BridgerMinigame::ROTATION_LIST)[$data["rotation"]]);
@@ -40,6 +43,9 @@ class BridgerMinigameConfigurationForm {
         $form->addStepSlider("§cDistance", array_map(function(string|int $value): string {
             return (string)$value;
         }, array_keys(BridgerMinigame::DISTANCE_LIST)), $distanceKey, "distance");
+        $form->addDropdown("§cBlock", array_map(function(Item $item): string {
+            return $item->getVanillaName();
+        }, $gameSession->getBlockSkins()), $gameSession->getBlockSkinKey(), "blockSkin");
         $form->addDropdown("§cType", array_keys(BridgerMinigame::ROTATION_LIST), $typeKey, "rotation");
         $form->addToggle("§cAutomatic height adjustment", $gameSession->isHeightAdjustments(), "heightAdjustment");
         if($player->isOp()) $form->addInput("§cGradient (Only OP)", "", "" . $gameSession->getGradient(), "gradient");
