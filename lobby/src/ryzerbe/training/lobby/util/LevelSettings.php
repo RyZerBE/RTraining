@@ -7,6 +7,6 @@ namespace ryzerbe\training\lobby\util;
 use pocketmine\level\Level;
 
 final class LevelSettings {
-    public const SNOW = true;
-    public const TIME = Level::TIME_MIDNIGHT;
+    public const SNOW = false;
+    public const TIME = Level::TIME_DAY;
 }
