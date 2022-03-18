@@ -277,8 +277,8 @@ class MLGRushGameSession extends GameSession {
             }
 
             foreach($session->getOnlinePlayers() as $sessionPlayer){
-                $ryZerPlayer = RyZerPlayerProvider::getRyzerPlayer($sessionPlayer);
-                $sessionPlayer->sendTitle($winner->getColor().$ryZerPlayer?->getName(true), TextFormat::GREEN." WON THE FIGHT!");
+                $ryZerWinner = RyZerPlayerProvider::getRyzerPlayer($winner->getPlayers()[0]);
+                $sessionPlayer->sendTitle($winner->getColor().$ryZerWinner?->getName(true), TextFormat::GREEN." WON THE FIGHT!");
             }
             $this->startCountdown(8, Countdown::END);
             $this->setState(Countdown::END);
