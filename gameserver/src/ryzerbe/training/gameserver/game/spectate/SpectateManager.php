@@ -16,6 +16,13 @@ class SpectateManager {
 
     public static function remove(Player $player): void {
         unset(self::$spectating[$player->getName()]);
+        foreach(self::$spectating as $name => $spectators) {
+            foreach($spectators as $key => $spectator) {
+                if($player->getName() === $spectator) {
+                    unset(self::$spectating[$name][$key]);
+                }
+            }
+        }
     }
 
     /**
