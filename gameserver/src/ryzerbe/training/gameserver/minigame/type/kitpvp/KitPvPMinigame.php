@@ -2,10 +2,17 @@
 
 namespace ryzerbe\training\gameserver\minigame\type\kitpvp;
 
+use pocketmine\block\BlockIds;
 use pocketmine\event\player\PlayerDeathEvent;
+use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\item\Item;
+use pocketmine\item\ItemIds;
+use pocketmine\item\SplashPotion;
 use pocketmine\level\Location;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\player\data\LoginPlayerData;
+use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\util\TextUtils;
 use ryzerbe\training\gameserver\game\GameSession;
 use ryzerbe\training\gameserver\game\map\GameMap;
@@ -18,6 +25,8 @@ use ryzerbe\training\gameserver\session\Session;
 use ryzerbe\training\gameserver\session\SessionManager;
 use ryzerbe\training\gameserver\util\Countdown;
 use ryzerbe\training\gameserver\util\Logger;
+use function in_array;
+use function min;
 
 class KitPvPMinigame extends Minigame {
     use MapManagerTrait;
@@ -155,5 +164,39 @@ class KitPvPMinigame extends Minigame {
         if(!$gameSession instanceof KitPvPGameSession) return;
         $session->getTeamByPlayer($player)?->removePlayer($player);
         $gameSession->checkGameEnd(!$gameSession->isRunning());
+    }
+
+    public function onInteract(PlayerInteractEvent $event): void {
+        $player = $event->getPlayer();
+        $session = SessionManager::getInstance()->getSessionOfPlayer($player);
+        $gameSession = $session?->getGameSession();
+        if(!$gameSession instanceof KitPvPGameSession) return;
+
+        if(!$gameSession->isRunning()) {
+            $event->setCancelled();
+            return;
+        }
+
+        $item = $event->getItem();
+        $inventory = $player->getInventory();
+        switch(true) {
+           case ($item instanceof SplashPotion): {
+               $inventory->setItemInHand(Item::get(0));
+               break;
+           }
+            case ($item->getId() === ItemIds::MUSHROOM_STEW): {
+                if((int)$player->getHealth() === $player->getMaxHealth()) return;
+                $rbePlayer = RyZerPlayerProvider::getRyzerPlayer($player);
+                $player->setHealth(min(($player->getHealth() + 4.5), 20));
+                if($rbePlayer === null) {
+                    $inventory->setItemInHand(Item::get(ItemIds::BOWL));
+                }else {
+                    $os = [LoginPlayerData::TOUCH, LoginPlayerData::CONTROLLER];
+                    $inventory->setItemInHand(in_array($rbePlayer->getLoginPlayerData()->getCurrentInputMode(), $os) ? Item::get(BlockIds::AIR) : Item::get(ItemIds::BOWL));
+                }
+                $player->playSound("random.eat", 2.0, 1.0, [$player]);
+                break;
+            }
+        }
     }
 }
