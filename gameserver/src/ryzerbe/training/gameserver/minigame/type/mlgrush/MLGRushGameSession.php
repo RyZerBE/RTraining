@@ -30,6 +30,7 @@ use ryzerbe\training\gameserver\util\Countdown;
 use ryzerbe\training\gameserver\util\ScoreboardUtils;
 use function array_key_first;
 use function array_keys;
+use function array_values;
 use function arsort;
 use function boolval;
 use function count;
@@ -277,7 +278,7 @@ class MLGRushGameSession extends GameSession {
             }
 
             foreach($session->getOnlinePlayers() as $sessionPlayer){
-                $ryZerWinner = RyZerPlayerProvider::getRyzerPlayer($winner->getPlayers()[0]);
+                $ryZerWinner = RyZerPlayerProvider::getRyzerPlayer(array_values($winner->getPlayers())[0]);
                 $sessionPlayer->sendTitle($winner->getColor().$ryZerWinner?->getName(true), TextFormat::GREEN." WON THE FIGHT!");
             }
             $this->startCountdown(8, Countdown::END);
